@@ -1,6 +1,10 @@
 # okapy
 
-The Python equivalent of `create-vite` — scaffolds production-ready Python backend projects with an interactive wizard. No more copy-pasting the same Django/FastAPI boilerplate.
+Scaffolds production-ready Python backend projects with an interactive wizard. Think `create-vite` for Python — no more copy-pasting boilerplate.
+
+```bash
+uvx okapy create
+```
 
 ## 1. Install
 
@@ -11,20 +15,31 @@ pip install okapy
 No install needed:
 ```bash
 uvx okapy create
+pipx run okapy create
 ```
 
 ## 2. Create a project
 
+Run the wizard:
 ```bash
 okapy create
 ```
 
-Follow the prompts to pick your framework, database, auth, and features.
+Pick your framework, database, auth methods, and features from the prompts. The CLI generates a complete project with a virtual environment, dependencies installed, and everything wired together.
 
-Skip the prompts for scripting:
+Skip the prompts for scripting or CI:
 ```bash
 okapy create --name myapi --framework django --type api --defaults
 ```
+
+Available flags:
+- `--framework` — `django`, `fastapi`, `flask`
+- `--type` — `api`, `ssr`, `hybrid`
+- `--database` — `sqlite`, `postgres`
+- `--deploy` — `none`, `docker`
+- `--with` — feature flags like `auth`, `jwt`, `postgres`, `celery`, `docker`, `s3`, `social`, and more
+- `--defaults` — skip all prompts with sensible defaults
+- `--force` — overwrite existing directory
 
 ## 3. Run it
 
@@ -36,11 +51,27 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+Your API is live at `http://localhost:8000`.
+
 ---
 
-- [Architecture](docs/ARCHITECTURE.md)
-- [Roadmap](docs/ROADMAP.md)
-- [PRD](docs/PRD.md)
-- [Contributing](CONTRIBUTING.md)
+## Features
+
+| Category | Features |
+|----------|----------|
+| Auth | Email/password, JWT, refresh tokens, Google OAuth, GitHub OAuth, magic link, OTP |
+| Database | PostgreSQL, SQLite |
+| Infrastructure | Redis, Celery, Docker |
+| Storage | AWS S3, Cloudinary |
+| Docs | Swagger, ReDoc |
+| Quality | Pytest, logging, GitHub Actions |
+
+Pass any combination: `okapy create --with auth --with jwt --with docker --with s3`
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
 
 MIT
