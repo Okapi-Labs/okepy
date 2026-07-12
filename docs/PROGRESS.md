@@ -1,4 +1,4 @@
-# okapy — Progress Tracker
+# okepy — Progress Tracker
 
 > Updated: Session 6 — Social authentication (Google, GitHub, Magic Link, OTP)
 
@@ -47,7 +47,7 @@
 - [x] Feature templates loaded from feature dirs (templating.py updated)
 - [x] Django wire() patches settings (AUTH_USER_MODEL, SIMPLE_JWT, EMAIL config)
 - [x] Django wire() patches urls (auth/ routes)
-- [x] Full chain: `okapy create --framework django --defaults` → runnable Django API with auth
+- [x] Full chain: `okepy create --framework django --defaults` → runnable Django API with auth
 - [x] Verified: `manage.py check` passes with auth for API, SSR, Hybrid
 
 ---
@@ -87,7 +87,7 @@
 - [ ] Flask scaffold, feature ports
 
 ### Phase 6 — Config & Non-Interactive Modes
-- [ ] `okapy.toml` / `okapy.json` config load/save
+- [ ] `okepy.toml` / `okepy.json` config load/save
 - [ ] `--config path`, environment-variable overrides
 - [ ] `--migrate` flag for Django
 - [ ] Improved validation
@@ -103,18 +103,18 @@
 ## Files Created/Modified (Session 6)
 
 **New:**
-- `src/okapy/features/social/__init__.py` — SocialFeature (depends on auth, installs 6 files)
-- `src/okapy/features/social/templates/social/__init__.py.jinja`
-- `src/okapy/features/social/templates/social/apps.py.jinja` — SocialAuthConfig (label=social_auth)
-- `src/okapy/features/social/templates/social/views.py.jinja` — 6 views: Google, GitHub, MagicLink (request/verify), OTP (request/verify)
-- `src/okapy/features/social/templates/social/serializers.py.jinja` — 6 serializers for all auth flows
-- `src/okapy/features/social/templates/social/urls.py.jinja` — 6 endpoints under auth/social/
-- `src/okapy/features/social/templates/social/backends.py.jinja` — OTP + magic link token gen via cache
+- `src/okepy/features/social/__init__.py` — SocialFeature (depends on auth, installs 6 files)
+- `src/okepy/features/social/templates/social/__init__.py.jinja`
+- `src/okepy/features/social/templates/social/apps.py.jinja` — SocialAuthConfig (label=social_auth)
+- `src/okepy/features/social/templates/social/views.py.jinja` — 6 views: Google, GitHub, MagicLink (request/verify), OTP (request/verify)
+- `src/okepy/features/social/templates/social/serializers.py.jinja` — 6 serializers for all auth flows
+- `src/okepy/features/social/templates/social/urls.py.jinja` — 6 endpoints under auth/social/
+- `src/okepy/features/social/templates/social/backends.py.jinja` — OTP + magic link token gen via cache
 
 **Modified:**
-- `src/okapy/features/__init__.py` — Registers SocialFeature
-- `src/okapy/frameworks/django/__init__.py` — Added _wire_social (apps, urls, auth backends, config)
-- `src/okapy/core/generator.py` — _default_env adds social auth env vars section
+- `src/okepy/features/__init__.py` — Registers SocialFeature
+- `src/okepy/frameworks/django/__init__.py` — Added _wire_social (apps, urls, auth backends, config)
+- `src/okepy/core/generator.py` — _default_env adds social auth env vars section
 
 ---
 

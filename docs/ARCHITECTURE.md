@@ -1,18 +1,18 @@
-# okapy Architecture
+# okepy Architecture
 
 ## Overview
 
-okapy is a modular CLI project generator for Python backend frameworks. It follows a plugin-driven architecture where every capability is a self-contained module. The core is framework-agnostic; framework-specific logic lives in adapter modules.
+okepy is a modular CLI project generator for Python backend frameworks. It follows a plugin-driven architecture where every capability is a self-contained module. The core is framework-agnostic; framework-specific logic lives in adapter modules.
 
 ## Module layout
 
 ```
-src/okapy/
+src/okepy/
     cli/                Typer application, commands, wizard orchestration
         app.py          Typer entry point, command groups
         wizard.py       Interactive prompts (Questionary) → ProjectConfig
         commands/
-            create.py   `okapy create` command, orchestrates generator
+            create.py   `okepy create` command, orchestrates generator
     core/               Abstract base classes, config models, registry
         config.py       Enums + Pydantic models for wizard selections
         context.py      ProjectContext — resolved, immutable project snapshot
@@ -99,10 +99,10 @@ Global registries for features and frameworks. Built-ins register on import; thi
 
 ## Plugin system
 
-Third-party features register via the `okapy.features` entry-point group:
+Third-party features register via the `okepy.features` entry-point group:
 
 ```toml
-[project.entry-points."okapy.features"]
+[project.entry-points."okepy.features"]
 paystack = "myplugin.paystack:PaystackFeature"
 ```
 
@@ -127,8 +127,8 @@ cli/app.py                    — Typer entry point
 
 Templates are loaded from two locations, searched in order:
 
-1. `src/okapy/frameworks/<framework>/templates/`
-2. `src/okapy/features/<feature>/templates/`
+1. `src/okepy/frameworks/<framework>/templates/`
+2. `src/okepy/features/<feature>/templates/`
 
 Template names use the `.jinja` extension (e.g., `models.py.jinja`). The `.jinja` suffix is stripped on write so generated files have normal extensions.
 

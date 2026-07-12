@@ -1,4 +1,4 @@
-# okapy — Implementation Roadmap
+# okepy — Implementation Roadmap
 
 > Phase-based, one phase per development session. Do **not** start later phases early.
 > Each session reads `docs/PRD.md`, `docs/ROADMAP.md`, and `docs/PROGRESS.md` and continues
@@ -15,7 +15,7 @@
 **Goal:** a runnable CLI that scaffolds a production-ready Django project with interactive wizard.
 
 - [x] `pyproject.toml` (src-layout, deps: typer, rich, questionary, pydantic, jinja2; dev: ruff, pytest)
-- [x] Package skeleton: `src/okapy/{cli,frameworks,features,templates,plugins,utils,core}`
+- [x] Package skeleton: `src/okepy/{cli,frameworks,features,templates,plugins,utils,core}`
 - [x] `core/config.py` — enums & selection models
 - [x] `core/context.py` — `ProjectContext` (Pydantic)
 - [x] `core/feature.py` — `Feature` ABC
@@ -40,7 +40,7 @@
 - [x] `--force` for overwrite, `--defaults` for minimal prompts
 - [x] Verified: `manage.py check` passes for all three project types
 
-**Exit criteria:** `okapy create --name foo --framework django --defaults --force` produces a runnable Django project with auth.
+**Exit criteria:** `okepy create --name foo --framework django --defaults --force` produces a runnable Django project with auth.
 
 ---
 
@@ -71,7 +71,7 @@
 - [ ] Golden tests for Flask output
 
 ## Phase 6 — Config & Non-Interactive Modes
-- [ ] `okapy.toml` / `okapy.json` config load/save (reproducible runs)
+- [ ] `okepy.toml` / `okepy.json` config load/save (reproducible runs)
 - [ ] `--config path` mode for CI/automation
 - [ ] `--dry-run` (plan only, no side effects)
 - [ ] Environment-variable overrides for CI
@@ -81,14 +81,14 @@
 - [ ] Document plugin authoring (cookiecutter-style minimal plugin repo)
 - [ ] Plugin command & framework-adapter contributions
 - [ ] Plugin isolation, version/compat checks, conflict reporting
-- [ ] Example reference plugin (e.g., `okapy-feature-stripe`)
+- [ ] Example reference plugin (e.g., `okepy-feature-stripe`)
 
 ## Phase 8 — Polish, DX & Release
 - [ ] Progress bars / spinners during generation (Rich Live)
 - [ ] Better error messages + remediation
 - [ ] Comprehensive docs site / README quickstart
-- [ ] Publish to PyPI; verify `uvx okapy` and `pipx run okapy`
-- [ ] Contribution guide, issue/PR templates, CI for okapy itself
+- [ ] Publish to PyPI; verify `uvx okepy` and `pipx run okepy`
+- [ ] Contribution guide, issue/PR templates, CI for okepy itself
 
 ## Phase 9+ — Future Frameworks (roadmap only)
 - [ ] Litestar, Quart, Sanic, Django Ninja, SQLModel, Strawberry GraphQL, Reflex, NiceGUI

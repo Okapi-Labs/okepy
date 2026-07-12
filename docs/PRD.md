@@ -1,4 +1,4 @@
-# okapy — Product Requirements Document (PRD)
+# okepy — Product Requirements Document (PRD)
 
 > The Python equivalent of `create-vite`, `create-next-app`, and `npm create astro`.
 > An interactive, modular, plugin-driven CLI that scaffolds production-ready Python backend projects.
@@ -7,7 +7,7 @@
 
 ## 1. Vision & Purpose
 
-`okapy` is **not** another Django boilerplate. It is a **modular CLI project generator**
+`okepy` is **not** another Django boilerplate. It is a **modular CLI project generator**
 that scaffolds production-ready backend projects for multiple Python web frameworks with a
 delightful, interactive, Vite-like experience.
 
@@ -21,9 +21,9 @@ django-admin startproject
 developers run a single command and are guided through an interactive setup wizard:
 
 ```bash
-okapy            # if installed
-uvx okapy        # run latest without installing
-pipx run okapy   # run latest without installing
+okepy            # if installed
+uvx okepy        # run latest without installing
+pipx run okepy   # run latest without installing
 ```
 
 The wizard asks about project type, framework, database, auth, background jobs, storage,
@@ -76,9 +76,9 @@ plugin system without touching core code.
 ## 4. Functional Requirements
 
 ### 4.1 Installation & Invocation
-- `pip install okapy` exposes a `okapy` console script.
-- `uvx okapy` and `pipx run okapy` run the latest published version ephemerally.
-- `python -m okapy` works from a source checkout.
+- `pip install okepy` exposes a `okepy` console script.
+- `uvx okepy` and `pipx run okepy` run the latest published version ephemerally.
+- `python -m okepy` works from a source checkout.
 - A `--version` flag and a helpful `--help`.
 
 ### 4.2 Interactive Wizard
@@ -102,7 +102,7 @@ The wizard collects (at minimum) the following, with multi-select where marked:
 The wizard must:
 - show a live, styled progress indicator,
 - allow `--defaults` / non-interactive mode driven by flags or a config file,
-- allow resuming / re-running via a saved `okapy.toml` / `okapy.json` config.
+- allow resuming / re-running via a saved `okepy.toml` / `okepy.json` config.
 
 ### 4.3 Project Generation
 - Create the target directory (refuse to overwrite non-empty dirs unless `--force`).
@@ -128,12 +128,12 @@ The wizard must:
 - The generator is framework-agnostic and delegates to the selected `Framework`.
 
 ### 4.6 Plugin System
-- Third-party features register via Python **entry points** (`okapy.features` group).
+- Third-party features register via Python **entry points** (`okepy.features` group).
 - Adding a plugin requires **no core changes** beyond listing it as a dependency.
 - Plugins can also contribute commands and framework adapters.
 
 ### 4.7 Configuration & Reproducibility
-- Selections are persisted to `okapy.{toml,json}` in the generated project for re-runs and audits.
+- Selections are persisted to `okepy.{toml,json}` in the generated project for re-runs and audits.
 - Support a `--config` file and environment-variable overrides for CI/automation.
 
 ### 4.8 Output & DX
@@ -162,7 +162,7 @@ The wizard must:
 Module layout (src-layout):
 
 ```
-src/okapy/
+src/okepy/
     cli/            # Typer app, commands, wizard orchestration
     frameworks/     # django/, fastapi/, flask/ + registry
     features/       # auth/, jwt/, refresh/, ... + registry
@@ -226,7 +226,7 @@ Key contracts:
 
 ## 10. Success Metrics
 
-- `uvx okapy` produces a runnable project for Django/FastAPI/Flask with chosen features in < 2 minutes.
+- `uvx okepy` produces a runnable project for Django/FastAPI/Flask with chosen features in < 2 minutes.
 - A contributor can add a new `Feature` in a single file + one registry line (or plugin entry point).
 - Generated projects pass their own test suite unmodified.
 - Clear, skimmable docs; active contributor PRs for new features/plugins.
@@ -236,7 +236,7 @@ Key contracts:
 ## 11. Open Questions
 
 - Default package manager for generation: `uv` (preferred) with `pip` fallback.
-- Should `okapy.toml` be the canonical config format (vs JSON/YAML)? → TOML preferred.
+- Should `okepy.toml` be the canonical config format (vs JSON/YAML)? → TOML preferred.
 - Exact dependency-resolution story (lockfiles vs loose pins) per framework.
 - How aggressive should auto-migration be (`--migrate` default?).
 
