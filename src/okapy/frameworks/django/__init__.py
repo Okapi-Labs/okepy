@@ -83,6 +83,10 @@ class DjangoFramework(Framework):
             self._wire_celery(context)
         if context.feature_enabled("social"):
             self._wire_social(context)
+        if context.feature_enabled("s3"):
+            self._wire_s3(context)
+        if context.feature_enabled("cloudinary"):
+            self._wire_cloudinary(context)
         if context.feature_enabled("pytest"):
             self._wire_pytest(context)
 
@@ -283,6 +287,51 @@ SOCIAL_AUTH_USER_MODEL = "users.User"
                 insert = f"    {auth_social}\n"
                 content = content.replace(marker, marker + "\n" + insert)
                 urls_path.write_text(content, encoding="utf-8")
+
+    @staticmethod
+    def _wire_s3(context: ProjectContext) -> None:
+        project_dir = context.project_dir
+        pkg = context.package_name
+        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        if not settings_path.exists():
+            return
+        content = settings_path.read_text(encoding="utf-8")
+        if "DEFAULT_FILE_STORAGE" in content and "storages.backends.s3" in content:
+            return
+        s3_block = """
+# AWS S3
+from decouple import config
+
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default="")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default="")
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default="")
+AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME", default="us-east-1")
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+"""
+        content += s3_block
+        settings_path.write_text(content, encoding="utf-8")
+
+    @staticmethod
+    def _wire_cloudinary(context: ProjectContext) -> None:
+        project_dir = context.project_dir
+        pkg = context.package_name
+        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        if not settings_path.exists():
+            return
+        content = settings_path.read_text(encoding="utf-8")
+        if "CLOUDINARY" in content:
+            return
+        cld_block = """
+# Cloudinary
+from decouple import config
+
+CLOUDINARY_CLOUD_NAME = config("CLOUDINARY_CLOUD_NAME", default="")
+CLOUDINARY_API_KEY = config("CLOUDINARY_API_KEY", default="")
+CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET", default="")
+"""
+        content += cld_block
+        settings_path.write_text(content, encoding="utf-8")
 
     @staticmethod
     def _wire_pytest(context: ProjectContext) -> None:
