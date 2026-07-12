@@ -1,0 +1,12 @@
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("google/", views.GoogleLoginView.as_view(), name="google-login"),
+    path("github/", views.GitHubLoginView.as_view(), name="github-login"),
+    path("magic-link/request/", views.MagicLinkRequestView.as_view(), name="magic-link-request"),
+    path("magic-link/verify/", views.MagicLinkVerifyView.as_view(), name="magic-link-verify"),
+    path("otp/request/", views.OTPRequestView.as_view(), name="otp-request"),
+    path("otp/verify/", views.OTPVerifyView.as_view(), name="otp-verify"),
+]
