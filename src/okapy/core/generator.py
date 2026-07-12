@@ -56,11 +56,23 @@ class Generator:
             pip_install(self.context.project_dir, *deps, backend=self.context.venv_backend)
 
     def install_features(self, framework: Framework) -> None:
+        from okapy.core.registry import get_feature
+
         names = order_features(self.context.features, framework=framework)
         if not names:
             return
         for name in names:
-            step(f"Installing feature: {name}")
+            feature = get_feature(name)
+            if feature is None:
+                step(f"Feature '{name}' not found, skipping")
+                continue
+            if not feature.is_compatible(self.context):
+                step(f"Feature '{feature.label or name}' is not compatible, skipping")
+                continue
+            step(f"Installing feature: {feature.label or name}")
+            if not self.dry_run:
+                feature.install(self.context)
+                success(f"{feature.label or name} installed")
 
     def wire(self, framework: Framework) -> None:
         step(f"Wiring {framework.label}")
