@@ -1,6 +1,6 @@
 # okepy — Progress Tracker
 
-> Updated: Session 6 — Social authentication (Google, GitHub, Magic Link, OTP)
+> Updated: Session 7 — Renamed project from okapy to okepy (name collision on PyPI)
 
 ## Current Phase
 
