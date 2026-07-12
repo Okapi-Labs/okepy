@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from okapy.core.feature import Feature
-from okapy.core.registry import (
+from okepy.core.feature import Feature
+from okepy.core.registry import (
     get_framework,
     list_frameworks,
     order_features,
     register_feature,
 )
-from okapy.frameworks import DjangoFramework, FastAPIFramework, FlaskFramework  # noqa: F401
+from okepy.frameworks import DjangoFramework, FastAPIFramework, FlaskFramework  # noqa: F401
 
 
 def test_builtin_frameworks_registered():

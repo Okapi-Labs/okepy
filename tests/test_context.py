@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from okapy.core.config import Framework, default_config
-from okapy.core.context import build_context
+from okepy.core.config import Framework, default_config
+from okepy.core.context import build_context
 
 
 def test_slugify_and_package_name():
@@ -15,8 +15,8 @@ def test_slugify_and_package_name():
 
 
 def test_context_uses_target_dir():
-    ctx = build_context(default_config("x"), base_dir=Path("/tmp/okapy-test"))
-    assert ctx.project_dir == Path("/tmp/okapy-test/x")
+    ctx = build_context(default_config("x"), base_dir=Path("/tmp/okepy-test"))
+    assert ctx.project_dir == Path("/tmp/okepy-test/x")
 
 
 def test_features_passthrough():

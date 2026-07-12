@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from okapy.core.config import (
+from okepy.core.config import (
     AuthProvider,
     Database,
     Deployment,
