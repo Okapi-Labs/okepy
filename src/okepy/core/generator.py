@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from okapy.core.context import ProjectContext
-from okapy.core.framework import Framework
-from okapy.core.registry import get_framework, order_features
-from okapy.utils.console import step, success
+from okepy.core.context import ProjectContext
+from okepy.core.framework import Framework
+from okepy.core.registry import get_framework, order_features
+from okepy.utils.console import step, success
 
 
 class Generator:
@@ -32,7 +32,7 @@ class Generator:
         self.context.venv_backend = backend
         step(f"Creating virtual environment ({backend})")
         if not self.dry_run:
-            from okapy.utils.shell import create_venv
+            from okepy.utils.shell import create_venv
 
             create_venv(self.context.project_dir, backend=backend)
             success("Virtual environment created")
@@ -45,7 +45,7 @@ class Generator:
         success(f"{framework.label} project scaffolded")
 
     def install_deps(self, framework: Framework) -> None:
-        from okapy.core.registry import get_feature
+        from okepy.core.registry import get_feature
 
         seen: set[str] = set()
         deps: list[str] = []
@@ -65,12 +65,12 @@ class Generator:
             return
         step(f"Installing dependencies: {', '.join(deps)}")
         if not self.dry_run:
-            from okapy.utils.shell import pip_install
+            from okepy.utils.shell import pip_install
 
             pip_install(self.context.project_dir, *deps, backend=self.context.venv_backend)
 
     def install_features(self, framework: Framework) -> None:
-        from okapy.core.registry import get_feature
+        from okepy.core.registry import get_feature
 
         names = order_features(self.context.features, framework=framework)
         if not names:
@@ -131,13 +131,13 @@ class Generator:
 
     @staticmethod
     def _detect_venv_backend() -> str:
-        from okapy.utils.shell import has_uv
+        from okepy.utils.shell import has_uv
 
         return "uv" if has_uv() else "venv"
 
 
 def _default_env(context: ProjectContext) -> str:
-    from okapy.core.registry import get_feature
+    from okepy.core.registry import get_feature
 
     cfg = context.config
     lines = [

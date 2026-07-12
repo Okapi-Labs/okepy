@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from okapy.core.feature import Feature
-from okapy.core.framework import Framework
+from okepy.core.feature import Feature
+from okepy.core.framework import Framework
 
 _FRAMEWORKS: dict[str, Framework] = {}
 _FEATURES: dict[str, Feature] = {}

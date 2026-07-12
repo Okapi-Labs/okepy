@@ -1,4 +1,4 @@
-"""The Feature contract — the heart of okapy's modular, plugin-driven design.
+"""The Feature contract — the heart of okepy's modular, plugin-driven design.
 
 A :class:`Feature` is a self-contained, independently-installable capability
 (auth, jwt, docker, …). It is responsible for its own package installs, file
@@ -10,19 +10,19 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from okapy.core.context import ProjectContext
+from okepy.core.context import ProjectContext
 
 
 class Feature(ABC):
     """Base class for every installable capability.
 
     Subclass this to add a feature. Built-in features live under
-    ``okapy.features.*``; third-party plugins subclass it too and register via
-    the ``okapy.features`` entry-point group.
+    ``okepy.features.*``; third-party plugins subclass it too and register via
+    the ``okepy.features`` entry-point group.
     """
 
     #: Unique, stable identifier. Should be a valid Python identifier and match
-    #: the corresponding :class:`okapy.core.config.FeatureName` where applicable.
+    #: the corresponding :class:`okepy.core.config.FeatureName` where applicable.
     name: str = ""
 
     #: Human-friendly label shown in prompts.

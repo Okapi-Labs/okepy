@@ -9,13 +9,13 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from okapy.core.context import ProjectContext
+from okepy.core.context import ProjectContext
 
 
 class Framework(ABC):
     """Base class for a target backend framework adapter."""
 
-    #: Stable identifier, matching :class:`okapy.core.config.Framework`.
+    #: Stable identifier, matching :class:`okepy.core.config.Framework`.
     name: str = ""
 
     #: Human-friendly label shown in prompts.

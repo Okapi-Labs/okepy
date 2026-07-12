@@ -10,7 +10,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from okapy.core.config import ProjectConfig
+from okepy.core.config import ProjectConfig
 
 
 class ProjectContext(BaseModel):
