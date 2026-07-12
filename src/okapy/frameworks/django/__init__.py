@@ -81,6 +81,8 @@ class DjangoFramework(Framework):
             self._wire_redis(context)
         if context.feature_enabled("celery"):
             self._wire_celery(context)
+        if context.feature_enabled("social"):
+            self._wire_social(context)
         if context.feature_enabled("pytest"):
             self._wire_pytest(context)
 
@@ -228,6 +230,59 @@ CELERY_TIMEZONE = "UTC"
             if import_line not in init_content:
                 init_content = import_line + init_content
                 config_init.write_text(init_content, encoding="utf-8")
+
+    @staticmethod
+    def _wire_social(context: ProjectContext) -> None:
+        project_dir = context.project_dir
+        pkg = context.package_name
+
+        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        if settings_path.exists():
+            content = settings_path.read_text(encoding="utf-8")
+
+            if f'"{pkg}.social_auth"' not in content:
+                marker = "INSTALLED_APPS = ["
+                insert = f'    "{pkg}.social_auth",\n'
+                content = content.replace(marker, marker + "\n" + insert)
+
+            if "social_django" not in content:
+                marker = "INSTALLED_APPS = ["
+                insert = '    "social_django",\n'
+                content = content.replace(marker, marker + "\n" + insert)
+
+            if "AUTHENTICATION_BACKENDS" not in content:
+                backends_block = """
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "social_core.backends.google.GoogleOAuth2",
+    "social_core.backends.github.GithubOAuth2",
+]
+"""
+                content += backends_block
+
+            social_cfg = """
+# Social auth
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("GOOGLE_CLIENT_ID", default="")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("GOOGLE_CLIENT_SECRET", default="")
+SOCIAL_AUTH_GITHUB_KEY = config("GITHUB_CLIENT_ID", default="")
+SOCIAL_AUTH_GITHUB_SECRET = config("GITHUB_CLIENT_SECRET", default="")
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
+SOCIAL_AUTH_USER_MODEL = "users.User"
+"""
+            if "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY" not in content:
+                content += social_cfg
+
+            settings_path.write_text(content, encoding="utf-8")
+
+        urls_path = project_dir / pkg / "config" / "urls.py"
+        if urls_path.exists():
+            content = urls_path.read_text(encoding="utf-8")
+            auth_social = f"path('auth/social/', include('{pkg}.social_auth.urls')),"
+            if auth_social not in content:
+                marker = "urlpatterns = ["
+                insert = f"    {auth_social}\n"
+                content = content.replace(marker, marker + "\n" + insert)
+                urls_path.write_text(content, encoding="utf-8")
 
     @staticmethod
     def _wire_pytest(context: ProjectContext) -> None:
