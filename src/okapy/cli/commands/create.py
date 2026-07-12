@@ -15,6 +15,7 @@ from rich.table import Table
 from okapy.core.config import Framework, ProjectConfig, default_config
 from okapy.core.context import build_context
 from okapy.core.generator import Generator
+from okapy.features import AuthFeature, JWTFeature, RefreshTokenFeature  # noqa: F401
 
 # Importing the frameworks package registers the built-in adapters.
 from okapy.frameworks import DjangoFramework, FastAPIFramework, FlaskFramework  # noqa: F401
