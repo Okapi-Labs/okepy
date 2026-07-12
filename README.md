@@ -6,38 +6,38 @@
   <img src="https://img.shields.io/badge/Framework-Flask-lightgrey" alt="Flask">
 </p>
 
-# okapy
+# okepy
 
 Scaffolds production-ready Python backend projects with an interactive wizard. Think `create-vite` for Python — no more copy-pasting boilerplate.
 
 ```bash
-uvx okapy create
+uvx okepy create
 ```
 
 ## 1. Install
 
 ```bash
-pip install okapy
+pip install okepy
 ```
 
 No install needed:
 ```bash
-uvx okapy create
-pipx run okapy create
+uvx okepy create
+pipx run okepy create
 ```
 
 ## 2. Create a project
 
 Run the wizard:
 ```bash
-okapy create
+okepy create
 ```
 
 Pick your framework, database, auth methods, and features from the prompts. The CLI generates a complete project with a virtual environment, dependencies installed, and everything wired together.
 
 Skip the prompts for scripting or CI:
 ```bash
-okapy create --name myapi --framework django --type api --defaults
+okepy create --name myapi --framework django --type api --defaults
 ```
 
 Available flags:
@@ -74,7 +74,7 @@ Your API is live at `http://localhost:8000`.
 | Docs | Swagger, ReDoc |
 | Quality | Pytest, logging, GitHub Actions |
 
-Pass any combination: `okapy create --with auth --with jwt --with docker --with s3`
+Pass any combination: `okepy create --with auth --with jwt --with docker --with s3`
 
 ## Contributing
 
