@@ -1,10 +1,10 @@
 # okapy — Progress Tracker
 
-> Updated: Session 5 — Infrastructure features (PostgreSQL, Docker, Redis, Celery)
+> Updated: Session 6 — Social authentication (Google, GitHub, Magic Link, OTP)
 
 ## Current Phase
 
-**Phase 2 — Infrastructure Features** (Completed)
+**Phase 5 — Social Authentication** (Completed)
 
 ---
 
@@ -55,18 +55,23 @@
 ## Remaining Tasks
 
 ### Phase 2 — Infrastructure Features (Session 5)
-- [x] PostgreSQL feature (contrib/db.py with DATABASE_URL parsing, psycopg2 dependency)
-- [x] Redis feature (contrib/redis.py with client helper, redis-py dependency)
-- [x] Celery feature (config/celery.py app, tasks.py, depends on redis, celery dependency)
-- [x] Celery wire — CELERY_* settings in base.py, celery_app import in config/__init__.py
-- [x] Redis wire — REDIS_URL + CACHES config in base.py using RedisCache
-- [x] PostgreSQL wire — DATABASE_URL override block in base.py settings
-- [x] Docker feature (Dockerfile with gunicorn, .dockerignore, docker-entrypoint.sh)
-- [x] Feature-level base_dependencies() contract — features can declare their own PyPI deps
-- [x] Generator deduplicates feature + framework dependencies before installing
-- [x] Feature env vars collected from all installed features into .env.example
-- [x] Database selection automatically implies the correct database feature (postgres/mysql/sqlite)
-- [x] Verified: manage.py check passes with all four features simultaneously
+- [x] PostgreSQL, Redis, Celery, Docker features
+- [x] Feature-level base_dependencies(), generator dedup, env var collection
+
+### Phase 5 — Social Authentication (Session 6)
+- [x] SocialFeature class — depends on auth, installs social_auth app
+- [x] Google OAuth login — verifies access token via Google API, creates/returns user + JWT
+- [x] GitHub OAuth login — verifies access token via GitHub API, creates/returns user + JWT
+- [x] Magic Link auth — request sends email with token link, verify exchanges for JWT
+- [x] OTP auth — request emails 6-digit code, verify exchanges for JWT
+- [x] backends.py — OTP and magic link token generation/verification via cache
+- [x] urls.py — all six endpoints under auth/social/
+- [x] Wire — social_auth + social_django in INSTALLED_APPS, AUTHENTICATION_BACKENDS, social config
+- [x] Wire — auth/social/ url routing
+- [x] Dependencies — social-auth-app-django, python3-openid
+- [x] Env vars — GOOGLE_CLIENT_ID/SECRET, GITHUB_CLIENT_ID/SECRET in .env.example
+- [x] Template namespace fix — social/ prefix avoids collision with auth templates
+- [x] Verified: manage.py check passes with Google + GitHub auth enabled
 
 ### Phase 3 — Core Features (Django)
 - [ ] postgres / mysql / sqlite features
@@ -95,28 +100,21 @@
 
 ---
 
-## Files Created/Modified (Session 5)
+## Files Created/Modified (Session 6)
 
 **New:**
-- `src/okapy/features/postgres/__init__.py` — PostgresFeature (install contrib/db.py, psycopg2 dep)
-- `src/okapy/features/postgres/templates/contrib/__init__.py.jinja`
-- `src/okapy/features/postgres/templates/contrib/db.py.jinja` — DATABASE_URL parser + fallback config
-- `src/okapy/features/redis/__init__.py` — RedisFeature (install contrib/redis.py, redis-py dep)
-- `src/okapy/features/redis/templates/contrib/redis.py.jinja` — Redis client helper
-- `src/okapy/features/celery/__init__.py` — CeleryFeature (depends on redis, installs config/celery.py + tasks.py)
-- `src/okapy/features/celery/templates/celery.py.jinja` — Celery application with autodiscover
-- `src/okapy/features/celery/templates/tasks.py.jinja` — Sample shared_task
-- `src/okapy/features/docker/__init__.py` — DockerFeature (Dockerfile, .dockerignore, entrypoint)
-- `src/okapy/features/docker/templates/Dockerfile.jinja` — Python 3.12-slim + gunicorn
-- `src/okapy/features/docker/templates/.dockerignore.jinja`
-- `src/okapy/features/docker/templates/docker-entrypoint.sh.jinja` — migrate + collectstatic
+- `src/okapy/features/social/__init__.py` — SocialFeature (depends on auth, installs 6 files)
+- `src/okapy/features/social/templates/social/__init__.py.jinja`
+- `src/okapy/features/social/templates/social/apps.py.jinja` — SocialAuthConfig (label=social_auth)
+- `src/okapy/features/social/templates/social/views.py.jinja` — 6 views: Google, GitHub, MagicLink (request/verify), OTP (request/verify)
+- `src/okapy/features/social/templates/social/serializers.py.jinja` — 6 serializers for all auth flows
+- `src/okapy/features/social/templates/social/urls.py.jinja` — 6 endpoints under auth/social/
+- `src/okapy/features/social/templates/social/backends.py.jinja` — OTP + magic link token gen via cache
 
 **Modified:**
-- `src/okapy/core/feature.py` — Added base_dependencies() to Feature ABC
-- `src/okapy/core/generator.py` — install_deps deduplicates feature + framework deps; _default_env collects env vars from all features
-- `src/okapy/core/config.py` — selected_features auto-includes database feature (postgres/mysql/sqlite)
-- `src/okapy/features/__init__.py` — Registers all four new features
-- `src/okapy/frameworks/django/__init__.py` — Added _wire_postgres, _wire_redis, _wire_celery methods
+- `src/okapy/features/__init__.py` — Registers SocialFeature
+- `src/okapy/frameworks/django/__init__.py` — Added _wire_social (apps, urls, auth backends, config)
+- `src/okapy/core/generator.py` — _default_env adds social auth env vars section
 
 ---
 
@@ -146,4 +144,4 @@
 
 ## Next Recommended Task
 
-**Phase 3 — Core Features (Django)** — pytest, docker-compose, swagger/redoc, logging, social auth:
+**Phase 3 — Core Features (Django)** — pytest, docker-compose, swagger/redoc, logging, github actions:
