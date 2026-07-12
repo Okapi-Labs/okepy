@@ -1,0 +1,42 @@
+import random
+import string
+from datetime import timedelta
+
+from django.conf import settings
+from django.core.cache import cache
+
+
+def _otp_cache_key(email: str) -> str:
+    return f"otp:{email}"
+
+
+def _magic_link_cache_key(token: str) -> str:
+    return f"magic_link:{token}"
+
+
+def generate_otp(email: str) -> str:
+    otp = "".join(random.choices(string.digits, k=6))
+    cache.set(_otp_cache_key(email), otp, timeout=300)
+    return otp
+
+
+def verify_otp(email: str, otp: str) -> bool:
+    stored = cache.get(_otp_cache_key(email))
+    if stored is None:
+        return False
+    cache.delete(_otp_cache_key(email))
+    return stored == otp
+
+
+def generate_magic_link_token(email: str) -> str:
+    token = "".join(random.choices(string.ascii_letters + string.digits, k=32))
+    cache.set(_magic_link_cache_key(token), email, timeout=900)
+    return token
+
+
+def verify_magic_link_token(token: str) -> str | None:
+    email = cache.get(_magic_link_cache_key(token))
+    if email is None:
+        return None
+    cache.delete(_magic_link_cache_key(token))
+    return email
