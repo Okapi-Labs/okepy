@@ -1,4 +1,4 @@
-"""The ``okapy create`` command.
+"""The ``okepy create`` command.
 
 Orchestrates: resolve config (wizard / defaults / config file) → build context →
 run the generator pipeline. Framework generation is implemented in later phases;
@@ -12,15 +12,15 @@ from pathlib import Path
 import typer
 from rich.table import Table
 
-from okapy.core.config import Framework, ProjectConfig, default_config
-from okapy.core.context import build_context
-from okapy.core.generator import Generator
-from okapy.features import AuthFeature, JWTFeature, RefreshTokenFeature  # noqa: F401
+from okepy.core.config import Framework, ProjectConfig, default_config
+from okepy.core.context import build_context
+from okepy.core.generator import Generator
+from okepy.features import AuthFeature, JWTFeature, RefreshTokenFeature  # noqa: F401
 
 # Importing the frameworks package registers the built-in adapters.
-from okapy.frameworks import DjangoFramework, FastAPIFramework, FlaskFramework  # noqa: F401
-from okapy.plugins.loader import load_features, load_frameworks
-from okapy.utils.console import banner, error, step
+from okepy.frameworks import DjangoFramework, FastAPIFramework, FlaskFramework  # noqa: F401
+from okepy.plugins.loader import load_features, load_frameworks
+from okepy.utils.console import banner, error, step
 
 _create = typer.Typer(help="Create a new Python backend project.")
 
@@ -67,10 +67,10 @@ def _bootstrap_plugins() -> None:
 
 
 def _resolve_config(name, framework, project_type, database, deployment, defaults, non_interactive) -> ProjectConfig:
-    from okapy.cli.wizard import run_wizard
-    from okapy.core.config import Database as DbEnum
-    from okapy.core.config import Deployment as DepEnum
-    from okapy.core.config import ProjectType as PtEnum
+    from okepy.cli.wizard import run_wizard
+    from okepy.core.config import Database as DbEnum
+    from okepy.core.config import Deployment as DepEnum
+    from okepy.core.config import ProjectType as PtEnum
 
     if non_interactive or defaults:
         base = default_config(name or "my-api")
@@ -106,6 +106,6 @@ def _print_summary(context) -> None:
     table.add_row("auth", ", ".join(p.value for p in cfg.auth_providers) or "—")
     table.add_row("features", ", ".join(context.features) or "—")
     table.add_row("deployment", cfg.deployment.value)
-    from okapy.utils.console import console
+    from okepy.utils.console import console
 
     console.print(table)

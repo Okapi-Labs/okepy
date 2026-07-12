@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from okapy.cli.app import app
+from okepy.cli.app import app
 
 __all__ = ["app"]

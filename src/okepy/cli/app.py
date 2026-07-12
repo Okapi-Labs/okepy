@@ -1,17 +1,17 @@
-"""Top-level Typer application for okapy."""
+"""Top-level Typer application for okepy."""
 
 from __future__ import annotations
 
 import typer
 from rich.table import Table
 
-from okapy import __version__
-from okapy.cli.commands.create import _create as create_app
-from okapy.core.registry import list_features, list_frameworks
-from okapy.utils.console import console
+from okepy import __version__
+from okepy.cli.commands.create import _create as create_app
+from okepy.core.registry import list_features, list_frameworks
+from okepy.utils.console import console
 
 app = typer.Typer(
-    name="okapy",
+    name="okepy",
     help="Scaffold production-ready Python backend projects interactively — the Python create-vite.",
     no_args_is_help=False,
     add_completion=True,
@@ -22,7 +22,7 @@ app.add_typer(create_app, name="create")
 
 def _version_callback(value: bool) -> None:
     if value:
-        console.print(f"okapy {__version__}")
+        console.print(f"okepy {__version__}")
         raise typer.Exit()
 
 
@@ -30,7 +30,7 @@ def _version_callback(value: bool) -> None:
 def main(
     version: bool = typer.Option(False, "--version", "-V", callback=_version_callback, is_eager=True, help="Show version and exit."),
 ) -> None:
-    """okapy — the Python equivalent of create-vite."""
+    """okepy — the Python equivalent of create-vite."""
 
 
 @app.command("list")

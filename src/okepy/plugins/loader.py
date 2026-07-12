@@ -1,7 +1,7 @@
 """Third-party plugin discovery via Python entry points.
 
 Plugins contribute features (and, eventually, frameworks/commands) by declaring
-entries under the ``okapy.features`` (and ``okapy.frameworks``) groups. Loading a
+entries under the ``okepy.features`` (and ``okepy.frameworks``) groups. Loading a
 plugin requires no core changes beyond installing the plugin package.
 """
 
@@ -9,11 +9,11 @@ from __future__ import annotations
 
 from importlib import metadata
 
-from okapy.core.feature import Feature
-from okapy.core.framework import Framework
+from okepy.core.feature import Feature
+from okepy.core.framework import Framework
 
-_FEATURE_GROUP = "okapy.features"
-_FRAMEWORK_GROUP = "okapy.frameworks"
+_FEATURE_GROUP = "okepy.features"
+_FRAMEWORK_GROUP = "okepy.frameworks"
 
 
 def discover_entry_points(group: str) -> dict[str, metadata.EntryPoint]:
@@ -33,8 +33,8 @@ def load_features() -> list:
     Each entry point is expected to resolve to a :class:`Feature` subclass or
     instance, or a module whose attributes are Feature subclasses.
     """
-    from okapy.core.feature import Feature
-    from okapy.core.registry import register_feature
+    from okepy.core.feature import Feature
+    from okepy.core.registry import register_feature
 
     loaded: list = []
     for _, ep in discover_entry_points(_FEATURE_GROUP).items():
@@ -52,7 +52,7 @@ def load_features() -> list:
 
 def load_frameworks() -> list:
     """Import and register plugin-contributed Framework instances."""
-    from okapy.core.registry import register_framework
+    from okepy.core.registry import register_framework
 
     loaded: list = []
     for _, ep in discover_entry_points(_FRAMEWORK_GROUP).items():
@@ -71,7 +71,7 @@ def load_frameworks() -> list:
 def _resolve(ep: metadata.EntryPoint):
     try:
         return ep.load()
-    except Exception:  # pragma: no cover - a broken plugin should not crash okapy
+    except Exception:  # pragma: no cover - a broken plugin should not crash okepy
         return None
 
 

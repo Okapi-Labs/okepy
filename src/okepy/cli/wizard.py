@@ -1,7 +1,7 @@
 """Interactive wizard: collects user selections via Questionary prompts.
 
-Produces a :class:`okapy.core.config.ProjectConfig`. Non-interactive callers can
-build a config directly via :func:`okapy.core.config.default_config` or by loading
+Produces a :class:`okepy.core.config.ProjectConfig`. Non-interactive callers can
+build a config directly via :func:`okepy.core.config.default_config` or by loading
 a config file (Phase 2).
 """
 
@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import questionary
 
-from okapy.core.config import (
+from okepy.core.config import (
     AuthProvider,
     Database,
     Deployment,

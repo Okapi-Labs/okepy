@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from okapy.core.config import ProjectType
-from okapy.core.context import ProjectContext
-from okapy.core.framework import Framework
-from okapy.utils.files import write_text
-from okapy.utils.templating import render_template
+from okepy.core.config import ProjectType
+from okepy.core.context import ProjectContext
+from okepy.core.framework import Framework
+from okepy.utils.files import write_text
+from okepy.utils.templating import render_template
 
 
 class DjangoFramework(Framework):

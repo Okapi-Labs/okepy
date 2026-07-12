@@ -6,8 +6,8 @@ wizard, context, registry, and generator pipeline are fully wired end-to-end.
 
 from __future__ import annotations
 
-from okapy.core.context import ProjectContext
-from okapy.core.framework import Framework
+from okepy.core.context import ProjectContext
+from okepy.core.framework import Framework
 
 
 class FlaskFramework(Framework):

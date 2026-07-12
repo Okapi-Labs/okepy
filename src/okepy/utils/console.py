@@ -46,7 +46,7 @@ def title(message: str) -> None:
 def banner() -> None:
     console.print(
         Panel(
-            "[title]okapy[/title] — the Python equivalent of create-vite\n"
+            "[title]okepy[/title] — the Python equivalent of create-vite\n"
             "[muted]Scaffold production-ready Python backend projects interactively.[/muted]",
             expand=False,
         )

@@ -1,16 +1,16 @@
 """Frameworks package: imports built-in adapters and registers them.
 
-Importing this package (which happens in :mod:`okapy.core.registry` bootstrap)
+Importing this package (which happens in :mod:`okepy.core.registry` bootstrap)
 populates the framework registry. Third-party frameworks are loaded separately
 via the plugin loader.
 """
 
 from __future__ import annotations
 
-from okapy.core.registry import register_framework
-from okapy.frameworks.django import DjangoFramework
-from okapy.frameworks.fastapi import FastAPIFramework
-from okapy.frameworks.flask import FlaskFramework
+from okepy.core.registry import register_framework
+from okepy.frameworks.django import DjangoFramework
+from okepy.frameworks.fastapi import FastAPIFramework
+from okepy.frameworks.flask import FlaskFramework
 
 register_framework(DjangoFramework())
 register_framework(FastAPIFramework())
