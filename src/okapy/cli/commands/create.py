@@ -19,7 +19,7 @@ from okapy.core.generator import Generator
 # Importing the frameworks package registers the built-in adapters.
 from okapy.frameworks import DjangoFramework, FastAPIFramework, FlaskFramework  # noqa: F401
 from okapy.plugins.loader import load_features, load_frameworks
-from okapy.utils.console import banner, error, step, success, warn
+from okapy.utils.console import banner, error, step
 
 _create = typer.Typer(help="Create a new Python backend project.")
 
@@ -55,18 +55,7 @@ def create(
 
     step("Running generation pipeline…")
     generator = Generator(context, dry_run=dry_run)
-    try:
-        generator.generate()
-    except NotImplementedError as exc:
-        # Phase 1: framework generation is intentionally not implemented yet.
-        warn(str(exc))
-        warn(
-            "This is expected in Phase 1 (CLI foundation). The wizard, context, "
-            "registry, and generator pipeline are fully wired. Framework generation "
-            "arrives in later phases (FastAPI: Phase 3, Django: Phase 6, Flask: Phase 7)."
-        )
-        success(f"Resolved project '{context.name}' → {context.project_dir}")
-        return
+    generator.generate()
 
 
 def _bootstrap_plugins() -> None:
@@ -78,16 +67,21 @@ def _bootstrap_plugins() -> None:
 
 def _resolve_config(name, framework, project_type, database, deployment, defaults, non_interactive) -> ProjectConfig:
     from okapy.cli.wizard import run_wizard
+    from okapy.core.config import Database as DbEnum
+    from okapy.core.config import Deployment as DepEnum
+    from okapy.core.config import ProjectType as PtEnum
 
     if non_interactive or defaults:
         base = default_config(name or "my-api")
         if name:
             base.name = name
         base.framework = framework
+        base.project_type = PtEnum(project_type)
+        base.database = DbEnum(database)
+        base.deployment = DepEnum(deployment)
         return base
 
     if name:
-        # Name provided but still interactive for the rest.
         cfg = run_wizard()
         cfg.name = name
         cfg.framework = framework

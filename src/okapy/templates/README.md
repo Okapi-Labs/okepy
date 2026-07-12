@@ -1,17 +1,13 @@
 # Templates
 
-Jinja2 templates for frameworks and features live here. Layout (added in Phase 3+):
+Jinja2 templates for frameworks and features live here.
 
 ```
 templates/
-    fastapi/
-    django/
-    flask/
-    features/
-        auth/
-        jwt/
-        docker/
-        ...
+    django/           # Django project templates (Phase 2+)
+    fastapi/          # FastAPI project templates (Phase 3+)
+    flask/            # Flask project templates (Phase 7+)
+    features/         # Feature templates (Phase 4+)
 ```
 
-Templates are rendered by the generator with the resolved `ProjectContext`.
+Templates are rendered by the generator using the resolved `ProjectContext`.

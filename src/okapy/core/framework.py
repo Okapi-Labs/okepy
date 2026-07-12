@@ -36,6 +36,6 @@ class Framework(ABC):
         """Wire selected features into the framework (urls, middleware, settings)."""
         raise NotImplementedError
 
-    def base_dependencies(self) -> list[str]:
+    def base_dependencies(self, context: ProjectContext | None = None) -> list[str]:
         """Return the baseline packages required by this framework."""
         return []

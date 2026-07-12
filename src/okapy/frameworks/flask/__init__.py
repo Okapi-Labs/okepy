@@ -24,5 +24,5 @@ class FlaskFramework(Framework):
             "Flask feature wiring is not implemented yet (planned: Phase 7)."
         )
 
-    def base_dependencies(self) -> list[str]:
+    def base_dependencies(self, context=None) -> list[str]:
         return ["flask"]

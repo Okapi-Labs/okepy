@@ -24,5 +24,5 @@ class FastAPIFramework(Framework):
             "FastAPI feature wiring is not implemented yet (planned: Phase 3)."
         )
 
-    def base_dependencies(self) -> list[str]:
+    def base_dependencies(self, context=None) -> list[str]:
         return ["fastapi", "uvicorn[standard]"]
