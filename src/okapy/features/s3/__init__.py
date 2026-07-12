@@ -23,7 +23,10 @@ class S3Feature(Feature):
         (storage_dir / "s3.py").write_text(content, encoding="utf-8")
 
     def base_dependencies(self, context: ProjectContext | None = None) -> list[str]:
-        return ["boto3>=1.34"]
+        return [
+            "boto3>=1.34",
+            "django-storages>=1.14",
+        ]
 
     def required_env(self) -> list[str]:
         return [

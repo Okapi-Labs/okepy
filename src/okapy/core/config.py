@@ -62,7 +62,8 @@ class FeatureName(str, Enum):
     REDOC = "redoc"
     GITHUB_ACTIONS = "github_actions"
     PYTEST = "pytest"
-    STORAGE = "storage"
+    S3 = "s3"
+    CLOUDINARY = "cloudinary"
     LOGGING = "logging"
 
 
