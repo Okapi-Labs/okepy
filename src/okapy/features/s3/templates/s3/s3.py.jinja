@@ -1,0 +1,47 @@
+import os
+
+import boto3
+from botocore.config import Config
+from django.core.files.storage import Storage
+from django.utils.deconstruct import deconstructible
+
+
+@deconstructible
+class S3Storage(Storage):
+    def __init__(self) -> None:
+        self.bucket_name = os.getenv("AWS_STORAGE_BUCKET_NAME", "")
+        self.region = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
+        self.client = boto3.client(
+            "s3",
+            region_name=self.region,
+            config=Config(signature_version="s3v4"),
+        )
+
+    def _save(self, name: str, content: bytes) -> str:
+        self.client.put_object(
+            Bucket=self.bucket_name,
+            Key=name,
+            Body=content,
+        )
+        return name
+
+    def _open(self, name: str) -> str:
+        url = self.client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": self.bucket_name, "Key": name},
+            ExpiresIn=3600,
+        )
+        return url
+
+    def exists(self, name: str) -> bool:
+        try:
+            self.client.head_object(Bucket=self.bucket_name, Key=name)
+            return True
+        except Exception:
+            return False
+
+    def delete(self, name: str) -> None:
+        self.client.delete_object(Bucket=self.bucket_name, Key=name)
+
+    def url(self, name: str) -> str:
+        return self._open(name)
