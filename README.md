@@ -1,3 +1,11 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python 3.10+">
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License">
+  <img src="https://img.shields.io/badge/Framework-Django-success" alt="Django">
+  <img src="https://img.shields.io/badge/Framework-FastAPI-informational" alt="FastAPI">
+  <img src="https://img.shields.io/badge/Framework-Flask-lightgrey" alt="Flask">
+</p>
+
 # okapy
 
 Scaffolds production-ready Python backend projects with an interactive wizard. Think `create-vite` for Python — no more copy-pasting boilerplate.
