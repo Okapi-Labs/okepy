@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from okapy.core.registry import register_feature
-from okapy.features.auth import AuthFeature
-from okapy.features.celery import CeleryFeature
-from okapy.features.cloudinary import CloudinaryFeature
-from okapy.features.docker import DockerFeature
-from okapy.features.jwt import JWTFeature
-from okapy.features.postgres import PostgresFeature
-from okapy.features.redis import RedisFeature
-from okapy.features.refresh import RefreshTokenFeature
-from okapy.features.s3 import S3Feature
-from okapy.features.social import SocialFeature
+from okepy.core.registry import register_feature
+from okepy.features.auth import AuthFeature
+from okepy.features.celery import CeleryFeature
+from okepy.features.cloudinary import CloudinaryFeature
+from okepy.features.docker import DockerFeature
+from okepy.features.jwt import JWTFeature
+from okepy.features.postgres import PostgresFeature
+from okepy.features.redis import RedisFeature
+from okepy.features.refresh import RefreshTokenFeature
+from okepy.features.s3 import S3Feature
+from okepy.features.social import SocialFeature
 
 register_feature(AuthFeature())
 register_feature(CeleryFeature())

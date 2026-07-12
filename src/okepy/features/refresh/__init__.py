@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from okapy.core.context import ProjectContext
-from okapy.core.feature import Feature
+from okepy.core.context import ProjectContext
+from okepy.core.feature import Feature
 
 
 class RefreshTokenFeature(Feature):
