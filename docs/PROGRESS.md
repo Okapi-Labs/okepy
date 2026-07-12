@@ -1,166 +1,105 @@
 # okapy — Progress Tracker
 
-> Updated: Session 1 — Planning & CLI Foundation
+> Updated: Session 3 — Django Auth (users app, JWT, email verification)
 
 ## Current Phase
 
-**Phase 1 — CLI Foundation** (Complete)
+**Phase 2/3 — Django Generation + Auth Features** (In Progress)
 
 ---
 
 ## Completed Tasks
 
-### Phase 0 — Planning
-- [x] Write `docs/PRD.md`
-- [x] Write `docs/ROADMAP.md`
-- [x] Write `docs/PROGRESS.md` (this file)
+### Phase 0 — Planning (Session 1)
+- [x] Write `docs/PRD.md`, `docs/ROADMAP.md`, `docs/PROGRESS.md`
 
-### Phase 1 — CLI Foundation
-- [x] `pyproject.toml` (src-layout, deps: typer, rich, questionary, pydantic, jinja2, tomlkit; dev: ruff, pytest)
-- [x] Package skeleton: `src/okapy/{cli,frameworks,features,generators,templates,plugins,utils,core}`
-- [x] `core/config.py` — enums & selection models (ProjectType, Framework, Database, FeatureName, AuthProvider, Deployment, ProjectConfig)
-- [x] `core/context.py` — `ProjectContext` (Pydantic), `build_context`, slugification
-- [x] `core/feature.py` — `Feature` ABC with `name`, `label`, `dependencies`, `conflicts`, `is_compatible`, `install`, `required_env`, `summary`
-- [x] `core/framework.py` — `Framework` ABC with `name`, `label`, `scaffold`, `wire`, `base_dependencies`
-- [x] `core/generator.py` — `Generator` pipeline (prepare, venv, scaffold, install_features, wire, env, finalize)
-- [x] `core/registry.py` — feature & framework registries, topological dependency ordering
-- [x] `plugins/loader.py` — entry-point plugin discovery (okapy.features, okapy.frameworks)
-- [x] `cli/app.py` — Typer app with `create` and `list` commands, `--version`, `--help`
-- [x] `cli/wizard.py` — interactive prompts (Questionary) building a `ProjectConfig`
-- [x] `cli/commands/create.py` — `okapy create` command with wizard/defaults, config resolution, generator pipeline
-- [x] `utils/console.py` — Rich console/theme, step/success/warn/error/banner/spinner helpers
-- [x] `utils/files.py` — ensure_dir, write_text, render_to_file helpers
-- [x] `utils/shell.py` — has_uv, has_pipx, run, create_venv (stub)
-- [x] Framework stubs: `frameworks/django/`, `frameworks/fastapi/`, `frameworks/flask/` (all raise NotImplementedError with phase info)
-- [x] `README.md` (project root)
-- [x] `CONTRIBUTING.md`
-- [x] `docs/ARCHITECTURE.md`
-- [x] Smoke tests — `tests/test_config.py` (5 tests), `test_context.py` (4 tests), `test_registry.py` (4 tests) — 12 total, all passing
-- [x] Ruff lint — 0 errors, 0 warnings
+### Phase 1 — CLI Foundation (Session 1)
+- [x] Package skeleton, core abstractions (config, context, feature, framework, generator, registry)
+- [x] Typer CLI with `create` and `list` commands, interactive wizard
+- [x] Plugin loader (entry-point discovery), utils (console, files, shell)
+- [x] Framework stubs (Django, FastAPI, Flask)
+- [x] Docs: README, CONTRIBUTING, ARCHITECTURE
+- [x] 12 smoke tests, ruff clean
+
+### Phase 2 — Django Generation (Session 2)
+- [x] `frameworks/django/` scaffold — manage.py, settings, urls, wsgi, asgi
+- [x] API project type — DRF, CORS, JWT, api app with health check
+- [x] SSR project type — web app with template, static files, home view
+- [x] Hybrid project type — both api and web apps
+- [x] Virtual environment creation (uv → venv)
+- [x] Base dependency installation (framework + database drivers)
+- [x] `--type`, `--database`, `--deploy` flags in defaults mode
+- [x] `.env.example` generation
+- [x] Next steps output
+
+### Phase 3 — Auth Features (Session 3)
+- [x] Generator actually calls `feature.install(context)` per feature
+- [x] `features/auth/` — users app with custom User model (email as USERNAME_FIELD)
+- [x] User registration, login, profile (MeView), email verification stubs
+- [x] `features/jwt/` — JWT feature (dependency for auth)
+- [x] `features/refresh/` — Refresh token feature (depends on jwt)
+- [x] Feature compatibility gating (is_compatible checks framework)
+- [x] Feature registration in `features/__init__.py`
+- [x] Feature templates loaded from feature dirs (templating.py updated)
+- [x] Django wire() patches settings (AUTH_USER_MODEL, SIMPLE_JWT, EMAIL config)
+- [x] Django wire() patches urls (auth/ routes)
+- [x] Full chain: `okapy create --framework django --defaults` → runnable Django API with auth
+- [x] Verified: `manage.py check` passes with auth for API, SSR, Hybrid
 
 ---
 
-## Remaining Tasks (Future Phases)
+## Remaining Tasks
 
 ### Phase 2 — Config & Non-Interactive Modes
 - [ ] `okapy.toml` / `okapy.json` config load/save
-- [ ] `--defaults` (sensible defaults) and `--config path` modes
-- [ ] `--dry-run` (plan only, no side effects)
-- [ ] Environment-variable overrides for CI
-- [ ] Validation, slugification, conflict detection improvements
-- [ ] Tests for config parsing & resolution
+- [ ] `--config path`, environment-variable overrides
+- [ ] `--migrate` flag for Django
+- [ ] Improved validation
 
-### Phase 3 — FastAPI Framework Adapter
-- [ ] `frameworks/fastapi/` scaffold (app factory, routers, pydantic-settings)
-- [ ] venv creation (uv → pip) + dependency install pipeline
-- [ ] Jinja2 template rendering pipeline
-- [ ] `.env.example` generation
-- [ ] End-to-end: `okapy create` → runnable FastAPI skeleton
-- [ ] Golden/snapshot tests
-
-### Phase 4 — Core Feature Modules (FastAPI)
-- [ ] pytest feature
+### Phase 3 — Core Features (Django)
 - [ ] postgres / mysql / sqlite features
-- [ ] jwt + refresh feature
-- [ ] auth feature (email/password)
-- [ ] swagger / redoc feature
+- [ ] swagger / redoc features
+- [ ] pytest feature
 - [ ] logging feature
-- [ ] Feature dependency resolution & ordered install (implemented in registry, needs feature impls)
+- [ ] social auth (Google, GitHub, Magic Link, OTP)
+- [ ] Docker / Docker Compose features
+- [ ] Celery / Redis features
+- [ ] Storage (S3 / Cloudinary) feature
+- [ ] GitHub Actions feature
+- [ ] Deployment configs (Render, Railway, Fly.io)
 
-### Phase 5 — Docker & Deployment Features
-- [ ] docker (Dockerfile + entrypoint)
-- [ ] docker_compose
-- [ ] celery + redis
-- [ ] github_actions CI workflow
-- [ ] storage (S3 / Cloudinary)
-- [ ] Deployment configs: Render, Railway, Fly.io
+### Phase 4 — FastAPI Framework Adapter
+- [ ] FastAPI scaffold, venv, deps, template pipeline
 
-### Phase 6 — Django Framework Adapter
-- [ ] `frameworks/django/` scaffold (settings, apps, urls, manage.py)
-- [ ] Port features to Django
-- [ ] social feature (Google/GitHub OAuth, Magic Link, OTP)
-- [ ] Migration running (`--migrate`)
-- [ ] Golden tests
+### Phase 5 — Flask Framework Adapter
+- [ ] Flask scaffold, feature ports
 
-### Phase 7 — Flask Framework Adapter
-- [ ] `frameworks/flask/` scaffold (app factory, blueprints, config)
-- [ ] Port features to Flask
-- [ ] Golden tests
-
-### Phase 8 — Plugin System Hardening
-- [ ] Document plugin authoring
-- [ ] Plugin command & framework-adapter contributions
-- [ ] Plugin isolation, version/compat checks, conflict reporting
-- [ ] Example reference plugin
-
-### Phase 9 — Polish, DX & Release
-- [ ] Progress bars / spinners (rich Live)
-- [ ] Better error messages + remediation
-- [ ] Comprehensive docs
-- [ ] Publish to PyPI; verify `uvx okapy` / `pipx run okapy`
-- [ ] Contribution guide, CI for okapy itself
-
-### Phase 10+ — Future Frameworks
-- [ ] Litestar, Quart, Sanic, Django Ninja, SQLModel, Strawberry GraphQL, Reflex, NiceGUI
+### Phase 6 — Polish & Release
+- [ ] Progress spinners, better errors, PyPI publish
 
 ---
 
-## Files Created
+## Files Created/Modified (Session 3)
 
-```
-okapy/
-├── README.md
-├── CONTRIBUTING.md
-├── pyproject.toml
-├── docs/
-│   ├── ARCHITECTURE.md
-│   ├── PRD.md
-│   ├── ROADMAP.md
-│   ├── PROGRESS.md
-├── src/
-│   └── okapy/
-│       ├── __init__.py
-│       ├── __main__.py
-│       ├── cli/
-│       │   ├── __init__.py
-│       │   ├── app.py
-│       │   ├── wizard.py
-│       │   └── commands/
-│       │       ├── __init__.py
-│       │       └── create.py
-│       ├── core/
-│       │   ├── config.py
-│       │   ├── context.py
-│       │   ├── feature.py
-│       │   ├── framework.py
-│       │   ├── generator.py
-│       │   └── registry.py
-│       ├── features/
-│       │   └── __init__.py
-│       ├── frameworks/
-│       │   ├── __init__.py
-│       │   ├── django/
-│       │   │   └── __init__.py
-│       │   ├── fastapi/
-│       │   │   └── __init__.py
-│       │   └── flask/
-│       │       └── __init__.py
-│       ├── generators/
-│       │   └── __init__.py
-│       ├── plugins/
-│       │   ├── __init__.py
-│       │   └── loader.py
-│       ├── templates/
-│       │   └── README.md
-│       └── utils/
-│           ├── console.py
-│           ├── files.py
-│           └── shell.py
-├── tests/
-│   ├── test_config.py
-│   ├── test_context.py
-│   └── test_registry.py
-```
+**New:**
+- `src/okapy/features/auth/__init__.py` — AuthFeature class
+- `src/okapy/features/auth/templates/__init__.py.jinja`
+- `src/okapy/features/auth/templates/apps.py.jinja`
+- `src/okapy/features/auth/templates/models.py.jinja` — Custom User model (email-based)
+- `src/okapy/features/auth/templates/serializers.py.jinja` — Register, Login, User serializers
+- `src/okapy/features/auth/templates/views.py.jinja` — RegisterView, LoginView, MeView, VerifyEmailView
+- `src/okapy/features/auth/templates/urls.py.jinja` — auth/ routes + JWT token endpoints
+- `src/okapy/features/auth/templates/admin.py.jinja` — User admin
+- `src/okapy/features/auth/templates/emails.py.jinja` — Email verification helper
+- `src/okapy/features/jwt/__init__.py` — JWTFeature
+- `src/okapy/features/refresh/__init__.py` — RefreshTokenFeature
+
+**Modified:**
+- `src/okapy/core/generator.py` — install_features now calls feature.install()
+- `src/okapy/features/__init__.py` — registers built-in features
+- `src/okapy/frameworks/django/__init__.py` — wire() patches settings/urls for auth
+- `src/okapy/utils/templating.py` — loads templates from feature dirs
+- `src/okapy/cli/commands/create.py` — imports features package
 
 ---
 
@@ -168,43 +107,32 @@ okapy/
 
 | Decision | Rationale |
 |----------|-----------|
-| **Typer** over Click | Native type hints, automatic --help, modern API |
-| **Questionary** over InquirerPy | Simpler API, well-established, prompt_toolkit-based |
-| **Rich** for all output | Consistent, beautiful terminal output; panels, tables, spinners |
-| **Pydantic v2** for models | Type-safe config/context; validation; JSON serialization for config files |
-| **Entry-point plugins** | Standard Python mechanism; no extra discovery framework needed |
-| **src-layout** | Standard for modern Python packages; avoids import confusion |
-| **Framework stubs raise NotImplementedError** | Clear phase boundaries; pipeline is tested end-to-end even before any framework is built |
-| **Feature install(context) contract** | Isolated, testable, independent features; third-party plugins use same interface |
-| **Topological dependency ordering** | Built into registry; features declare deps, generator resolves order automatically |
-| **TOML for config** | Python-native parsing via tomlkit; readable; standard for pyproject.toml ecosystem |
-| **Optional[str] type annotation style** | Using `X | None` syntax (PEP 604) with `from __future__ import annotations` |
+| **Feature installs after scaffold** | Scaffold creates baselines; features add their own files on top; wire() patches everything |
+| **Feature templates in feature dirs** | Self-contained features; no cross-package template coupling |
+| **Wire() patches generated files** | Simple string replacement avoids fragile template conditionals for feature combinations |
+| **Custom User model with email auth** | Modern Django best practice; USERNAME_FIELD = email for API-first projects |
+| **JWT as separate feature dependency** | Auth depends on JWT; clean separation of concerns; JWT usable standalone |
+| **Feature is_compatible() gating** | Prevents running Django features on FastAPI projects |
 
 ---
 
 ## Known Issues
 
-- [x] **Fixed:** `_make_feature` test helper had `NameError` due to Python closure-in-class-body scoping issue. Replaced with `type()` metaclass approach.
-- [x] **Fixed:** `okapy create create` nesting issue. Changed `@_create.command("create")` to `@_create.callback(invoke_without_command=True)`.
-- [x] **Fixed:** `test_registry.py` didn't import `okapy.frameworks` to trigger framework registration.
-- [x] **Fixed:** `loader.py` had F821 undefined names for `Feature`/`Framework` in `_iter_candidates`. Added module-level imports.
-- [ ] No built-in features registered yet (Phase 4+)
-- [ ] No framework generation implemented yet (Phase 3+)
-- [ ] Virtual environment creation is stubbed (Phase 3)
-- [ ] `.env.example` generation is stubbed (Phase 3)
-- [ ] Template rendering pipeline is not implemented (Phase 3)
+- [x] **Fixed:** Feature templates not found — templating.py now scans feature dirs for templates/
+- [x] **Fixed:** Duplicate app labels in INSTALLED_APPS — wire() now only adds package.users
+- [x] **Fixed:** URL include used bare `users.urls` instead of `package.users.urls`
+- [ ] Celery, Docker, pytest, swagger, and other features not yet implemented (will log "not found")
+- [ ] FastAPI and Flask stubs still raise NotImplementedError
+- [ ] No `--migrate` flag yet (user must run `python manage.py migrate` manually)
 
 ---
 
 ## Next Recommended Task
 
-**Phase 2: Config & Non-Interactive Modes**
+**Docker feature** — Dockerfile + docker-compose.yml generation for Django projects:
 
-1. Implement `okapy.toml` config load/save in `core/config.py` (serialize `ProjectConfig` to TOML, deserialize from TOML)
-2. Add `--config path` option to `create` command
-3. Implement `--dry-run` side-effect analysis mode
-4. Add environment-variable overrides
-5. Add validation for target directory conflicts
-6. Write tests for config file parsing and resolution
-
-This phase is a prerequisite for CI/automation use cases and enables reproducible project generation.
+1. Create `src/okapy/features/docker/` with Dockerfile template
+2. Create `src/okapy/features/docker_compose/` with docker-compose.yml template
+3. Register both in `features/__init__.py`
+4. Wire into Django: update .dockerignore, entrypoint, gunicorn config
+5. Test: `okapy create --framework django --defaults` + verify Dockerfile exists
