@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "okepy"
-version = "0.1.0"
+version = "0.1.1"
 description = "The Python equivalent of create-vite: an interactive, modular, plugin-driven CLI that scaffolds production-ready Python backend projects."
 readme = "README.md"
 requires-python = ">=3.10"
