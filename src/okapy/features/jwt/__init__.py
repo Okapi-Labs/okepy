@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from okapy.core.context import ProjectContext
 from okapy.core.feature import Feature
+from okapy.utils.templating import render_template
 
 
 class JWTFeature(Feature):
@@ -9,7 +10,11 @@ class JWTFeature(Feature):
     label = "JWT Auth"
 
     def install(self, context: ProjectContext) -> None:
-        pass
+        package = context.package_name
+        project_dir = context.project_dir
+        ctx = {"package_name": package}
+        content = render_template("jwt.py.jinja", ctx)
+        (project_dir / package / "jwt.py").write_text(content, encoding="utf-8")
 
     def required_env(self) -> list[str]:
         return [

@@ -28,13 +28,12 @@ Be respectful, inclusive, and constructive. We follow the [Python Community Code
 ```
 src/okapy/
     cli/            # Typer CLI, commands, wizard
-    core/           # Abstract base classes, config, context, registry
+    core/           # Abstract base classes, config, context, registry, Generator
     frameworks/     # Framework adapters (Django, FastAPI, Flask)
     features/       # Capability modules (auth, jwt, docker, ...)
-    generators/     # Generation pipeline orchestrator
     templates/      # Jinja2 templates
     plugins/        # Third-party plugin discovery
-    utils/          # Console, filesystem, shell helpers
+    utils/          # Console, filesystem, shell, templating helpers
 ```
 
 ## Adding a feature

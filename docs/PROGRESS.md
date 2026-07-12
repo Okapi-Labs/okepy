@@ -1,10 +1,10 @@
 # okapy — Progress Tracker
 
-> Updated: Session 3 — Django Auth (users app, JWT, email verification)
+> Updated: Session 4 — Auth feature complete (LoginView issues tokens, email verification works, JWT utility module)
 
 ## Current Phase
 
-**Phase 2/3 — Django Generation + Auth Features** (In Progress)
+**Phase 2 — Docker & Deployment Features** (Starting)
 
 ---
 
@@ -32,11 +32,15 @@
 - [x] `.env.example` generation
 - [x] Next steps output
 
-### Phase 3 — Auth Features (Session 3)
+### Phase 3 — Auth Features (Session 3–4)
 - [x] Generator actually calls `feature.install(context)` per feature
 - [x] `features/auth/` — users app with custom User model (email as USERNAME_FIELD)
-- [x] User registration, login, profile (MeView), email verification stubs
-- [x] `features/jwt/` — JWT feature (dependency for auth)
+- [x] User registration, login, profile (MeView), email verification
+- [x] LoginView issues JWT access + refresh tokens on valid credentials
+- [x] VerifyEmailView verifies tokens via Django's default_token_generator
+- [x] RegisterView triggers verification email on account creation
+- [x] emails.py generates signed tokens with urlsafe_base64_encode + default_token_generator
+- [x] `features/jwt/` — JWT feature installs a jwt.py utility module (create_tokens, default_jwt_settings)
 - [x] `features/refresh/` — Refresh token feature (depends on jwt)
 - [x] Feature compatibility gating (is_compatible checks framework)
 - [x] Feature registration in `features/__init__.py`
@@ -50,11 +54,13 @@
 
 ## Remaining Tasks
 
-### Phase 2 — Config & Non-Interactive Modes
-- [ ] `okapy.toml` / `okapy.json` config load/save
-- [ ] `--config path`, environment-variable overrides
-- [ ] `--migrate` flag for Django
-- [ ] Improved validation
+### Phase 2 — Docker & Deployment Features
+- [ ] Docker feature (Dockerfile + entrypoint)
+- [ ] Docker Compose feature (app + db + redis + worker)
+- [ ] Celery / Redis features
+- [ ] GitHub Actions CI workflow feature
+- [ ] Storage (S3 / Cloudinary) feature
+- [ ] Deployment configs (Render, Railway, Fly.io)
 
 ### Phase 3 — Core Features (Django)
 - [ ] postgres / mysql / sqlite features
@@ -62,11 +68,6 @@
 - [ ] pytest feature
 - [ ] logging feature
 - [ ] social auth (Google, GitHub, Magic Link, OTP)
-- [ ] Docker / Docker Compose features
-- [ ] Celery / Redis features
-- [ ] Storage (S3 / Cloudinary) feature
-- [ ] GitHub Actions feature
-- [ ] Deployment configs (Render, Railway, Fly.io)
 
 ### Phase 4 — FastAPI Framework Adapter
 - [ ] FastAPI scaffold, venv, deps, template pipeline
@@ -74,32 +75,32 @@
 ### Phase 5 — Flask Framework Adapter
 - [ ] Flask scaffold, feature ports
 
-### Phase 6 — Polish & Release
+### Phase 6 — Config & Non-Interactive Modes
+- [ ] `okapy.toml` / `okapy.json` config load/save
+- [ ] `--config path`, environment-variable overrides
+- [ ] `--migrate` flag for Django
+- [ ] Improved validation
+
+### Phase 7 — Plugin System
+- [ ] Plugin authoring docs, example plugin, version checks
+
+### Phase 8 — Polish & Release
 - [ ] Progress spinners, better errors, PyPI publish
 
 ---
 
-## Files Created/Modified (Session 3)
+## Files Created/Modified (Session 4)
 
 **New:**
-- `src/okapy/features/auth/__init__.py` — AuthFeature class
-- `src/okapy/features/auth/templates/__init__.py.jinja`
-- `src/okapy/features/auth/templates/apps.py.jinja`
-- `src/okapy/features/auth/templates/models.py.jinja` — Custom User model (email-based)
-- `src/okapy/features/auth/templates/serializers.py.jinja` — Register, Login, User serializers
-- `src/okapy/features/auth/templates/views.py.jinja` — RegisterView, LoginView, MeView, VerifyEmailView
-- `src/okapy/features/auth/templates/urls.py.jinja` — auth/ routes + JWT token endpoints
-- `src/okapy/features/auth/templates/admin.py.jinja` — User admin
-- `src/okapy/features/auth/templates/emails.py.jinja` — Email verification helper
-- `src/okapy/features/jwt/__init__.py` — JWTFeature
-- `src/okapy/features/refresh/__init__.py` — RefreshTokenFeature
+- `src/okapy/features/jwt/templates/jwt.py.jinja` — JWT utility module (create_tokens, default_jwt_settings)
 
 **Modified:**
-- `src/okapy/core/generator.py` — install_features now calls feature.install()
-- `src/okapy/features/__init__.py` — registers built-in features
-- `src/okapy/frameworks/django/__init__.py` — wire() patches settings/urls for auth
-- `src/okapy/utils/templating.py` — loads templates from feature dirs
-- `src/okapy/cli/commands/create.py` — imports features package
+- `src/okapy/features/auth/templates/views.py.jinja` — LoginView issues JWT tokens; RegisterView sends verification email; VerifyEmailView verifies tokens
+- `src/okapy/features/auth/templates/emails.py.jinja` — Token generation via urlsafe_base64_encode + default_token_generator
+- `src/okapy/features/jwt/__init__.py` — install() creates jwt.py utility module in generated project
+
+### Previous sessions
+See Session 3 for original auth scaffold files.
 
 ---
 
@@ -129,7 +130,7 @@
 
 ## Next Recommended Task
 
-**Docker feature** — Dockerfile + docker-compose.yml generation for Django projects:
+**Phase 2 — Docker Feature** — Dockerfile + docker-compose.yml generation for Django projects:
 
 1. Create `src/okapy/features/docker/` with Dockerfile template
 2. Create `src/okapy/features/docker_compose/` with docker-compose.yml template

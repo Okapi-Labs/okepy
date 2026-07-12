@@ -165,13 +165,11 @@ Module layout (src-layout):
 src/okapy/
     cli/            # Typer app, commands, wizard orchestration
     frameworks/     # django/, fastapi/, flask/ + registry
-    features/       # auth/, jwt/, social/, celery/, docker/, postgres/, redis/,
-                    # github_actions/, swagger/, pytest/, storage/, logging/ + registry
-    generators/     # orchestrates directory, venv, install, template render, feature run
-    templates/      # Jinja2 templates (per framework/feature)
+    features/       # auth/, jwt/, refresh/, ... + registry
+    core/           # context, config, Feature/Framework/Generator ABCs, registry
+    templates/      # Jinja2 templates (framework baselines)
     plugins/        # third-party plugin discovery/loading
-    utils/          # console (rich), files, shell/venv, git, rendering helpers
-    core/           # context, config models, Feature/Framework/Generator ABCs, registry
+    utils/          # console, files, shell/venv, templating helpers
 ```
 
 Key contracts:
