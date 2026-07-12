@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in okapy! We welcome contributions of all kinds — bug reports, feature requests, documentation, and code.
+Thank you for your interest in okepy! We welcome contributions of all kinds — bug reports, feature requests, documentation, and code.
 
 ## Code of conduct
 
@@ -27,7 +27,7 @@ Be respectful, inclusive, and constructive. We follow the [Python Community Code
 ## Project structure
 
 ```
-src/okapy/
+src/okepy/
     cli/            # Typer CLI, commands, wizard
     core/           # Abstract base classes, config, context, registry, Generator
     frameworks/     # Framework adapters (Django, FastAPI, Flask)
@@ -44,11 +44,11 @@ docs/               # PRD, ROADMAP, PROGRESS, ARCHITECTURE
 
 ## Adding a feature
 
-1. Create `src/okapy/features/<name>/__init__.py` with a subclass of `Feature`
+1. Create `src/okepy/features/<name>/__init__.py` with a subclass of `Feature`
 2. Define `name`, `label`, `install(context)`, and optionally `base_dependencies()`, `required_env()`, `is_compatible()`
-3. Create templates under `src/okapy/features/<name>/templates/<name>/` (namespace prefix required to avoid collisions)
-4. Register the feature in `src/okapy/features/__init__.py` via `register_feature()`
-5. Update the wizard in `src/okapy/cli/wizard.py` if the feature requires user input
+3. Create templates under `src/okepy/features/<name>/templates/<name>/` (namespace prefix required to avoid collisions)
+4. Register the feature in `src/okepy/features/__init__.py` via `register_feature()`
+5. Update the wizard in `src/okepy/cli/wizard.py` if the feature requires user input
 6. If the framework adapter needs wiring, add a `_wire_<name>()` method in the framework's `__init__.py` and call it from `wire()`
 7. Add env var placeholders to the generator's `.env.example` generation
 8. Write tests
@@ -56,9 +56,9 @@ docs/               # PRD, ROADMAP, PROGRESS, ARCHITECTURE
 ### Feature template
 
 ```python
-from okapy.core.context import ProjectContext
-from okapy.core.feature import Feature
-from okapy.utils.templating import render_template
+from okepy.core.context import ProjectContext
+from okepy.core.feature import Feature
+from okepy.utils.templating import render_template
 
 
 class MyFeature(Feature):
@@ -82,15 +82,15 @@ class MyFeature(Feature):
 
 ## Adding a framework
 
-1. Create `src/okapy/frameworks/<name>/__init__.py` with a subclass of `Framework`
+1. Create `src/okepy/frameworks/<name>/__init__.py` with a subclass of `Framework`
 2. Define `name`, `label`, `scaffold(context)`, `wire(context)`, `base_dependencies()`
-3. Register it in `src/okapy/frameworks/__init__.py`
+3. Register it in `src/okepy/frameworks/__init__.py`
 
 ### Framework template
 
 ```python
-from okapy.core.context import ProjectContext
-from okapy.core.framework import Framework
+from okepy.core.context import ProjectContext
+from okepy.core.framework import Framework
 
 
 class MyFramework(Framework):
@@ -130,4 +130,4 @@ All generated projects must pass `python manage.py check` for Django and equival
 
 ## Questions?
 
-Open a [discussion](https://github.com/okapy/okapy/discussions) or an [issue](https://github.com/okapy/okapy/issues).
+Open a [discussion](https://github.com/okepy/okepy/discussions) or an [issue](https://github.com/okepy/okepy/issues).
