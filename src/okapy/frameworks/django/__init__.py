@@ -73,6 +73,72 @@ class DjangoFramework(Framework):
             )
 
     def wire(self, context: ProjectContext) -> None:
+        if context.feature_enabled("auth"):
+            self._wire_auth(context)
+        if context.feature_enabled("postgres"):
+            self._wire_postgres(context)
+        if context.feature_enabled("pytest"):
+            self._wire_pytest(context)
+
+    @staticmethod
+    def _wire_auth(context: ProjectContext) -> None:
+        project_dir = context.project_dir
+        package = context.package_name
+
+        settings_path = project_dir / package / "config" / "settings" / "base.py"
+        if settings_path.exists():
+            content = settings_path.read_text(encoding="utf-8")
+
+            if f'"{package}.users"' not in content:
+                marker = "INSTALLED_APPS = ["
+                insert = f'    "{package}.users",\n'
+                content = content.replace(marker, marker + "\n" + insert)
+
+            if "AUTH_USER_MODEL" not in content:
+                content += '\nAUTH_USER_MODEL = "users.User"\n'
+
+            jwt_block = """
+# JWT
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+"""
+            if "SIMPLE_JWT" not in content:
+                content += jwt_block
+
+            email_block = f"""
+# Email
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 1025
+DEFAULT_FROM_EMAIL = "noreply@example.com"
+SITE_NAME = "{context.name}"
+FRONTEND_URL = "http://localhost:3000"
+"""
+            if "EMAIL_BACKEND" not in content:
+                content += email_block
+
+            settings_path.write_text(content, encoding="utf-8")
+
+        urls_path = project_dir / package / "config" / "urls.py"
+        if urls_path.exists():
+            content = urls_path.read_text(encoding="utf-8")
+            if "path('auth/'" not in content:
+                marker = "urlpatterns = ["
+                insert = f"    path('auth/', include('{package}.users.urls')),\n"
+                content = content.replace(marker, marker + "\n" + insert)
+                urls_path.write_text(content, encoding="utf-8")
+
+    @staticmethod
+    def _wire_postgres(context: ProjectContext) -> None:
+        pass
+
+    @staticmethod
+    def _wire_pytest(context: ProjectContext) -> None:
         pass
 
     def base_dependencies(self, context: ProjectContext | None = None) -> list[str]:
