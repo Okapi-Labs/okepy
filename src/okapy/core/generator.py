@@ -173,6 +173,15 @@ def _default_env(context: ProjectContext) -> str:
             "# Redis",
             "REDIS_URL=redis://localhost:6379/0",
         ])
+    if context.feature_enabled("social"):
+        lines.extend([
+            "",
+            "# Social Auth",
+            "GOOGLE_CLIENT_ID=",
+            "GOOGLE_CLIENT_SECRET=",
+            "GITHUB_CLIENT_ID=",
+            "GITHUB_CLIENT_SECRET=",
+        ])
     if context.feature_enabled("celery") or cfg.background_jobs:
         lines.extend([
             "",
