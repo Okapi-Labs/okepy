@@ -77,6 +77,10 @@ class DjangoFramework(Framework):
             self._wire_auth(context)
         if context.feature_enabled("postgres"):
             self._wire_postgres(context)
+        if context.feature_enabled("redis"):
+            self._wire_redis(context)
+        if context.feature_enabled("celery"):
+            self._wire_celery(context)
         if context.feature_enabled("pytest"):
             self._wire_pytest(context)
 
@@ -135,7 +139,95 @@ FRONTEND_URL = "http://localhost:3000"
 
     @staticmethod
     def _wire_postgres(context: ProjectContext) -> None:
-        pass
+        project_dir = context.project_dir
+        pkg = context.package_name
+        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        if not settings_path.exists():
+            return
+        content = settings_path.read_text(encoding="utf-8")
+        if "DATABASE_URL" in content:
+            return
+        pg_block = """
+# PostgreSQL (from DATABASE_URL)
+import os
+from urllib.parse import urlparse
+
+_db_url = os.getenv("DATABASE_URL", "")
+if _db_url:
+    _parsed = urlparse(_db_url)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": _parsed.path[1:],
+            "USER": _parsed.username,
+            "PASSWORD": _parsed.password,
+            "HOST": _parsed.hostname,
+            "PORT": _parsed.port or 5432,
+        }
+    }
+"""
+        if "DATABASES" in content:
+            content += pg_block
+        settings_path.write_text(content, encoding="utf-8")
+
+    @staticmethod
+    def _wire_redis(context: ProjectContext) -> None:
+        project_dir = context.project_dir
+        pkg = context.package_name
+        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        if not settings_path.exists():
+            return
+        content = settings_path.read_text(encoding="utf-8")
+        if "REDIS_URL" in content:
+            return
+        redis_block = """
+# Redis
+from decouple import config
+
+REDIS_URL = config("REDIS_URL", default="redis://localhost:6379/0")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URL,
+    }
+}
+"""
+        content += redis_block
+        settings_path.write_text(content, encoding="utf-8")
+
+    @staticmethod
+    def _wire_celery(context: ProjectContext) -> None:
+        project_dir = context.project_dir
+        pkg = context.package_name
+        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        if not settings_path.exists():
+            return
+        content = settings_path.read_text(encoding="utf-8")
+        if "CELERY_BROKER_URL" in content:
+            return
+        celery_block = """
+# Celery
+from decouple import config
+
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://localhost:6379/0")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
+"""
+        content += celery_block
+        settings_path.write_text(content, encoding="utf-8")
+
+        # Wire celery app into config/__init__.py so it loads on Django startup
+        config_init = project_dir / pkg / "config" / "__init__.py"
+        if config_init.exists():
+            init_content = config_init.read_text(encoding="utf-8")
+            import_line = f"from {pkg}.config.celery import app as celery_app\n"
+            if import_line not in init_content:
+                init_content = import_line + init_content
+                config_init.write_text(init_content, encoding="utf-8")
 
     @staticmethod
     def _wire_pytest(context: ProjectContext) -> None:

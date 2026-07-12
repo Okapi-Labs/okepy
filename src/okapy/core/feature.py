@@ -55,6 +55,15 @@ class Feature(ABC):
         """
         raise NotImplementedError
 
+    def base_dependencies(self, context: ProjectContext | None = None) -> list[str]:
+        """PyPI packages this feature requires.
+
+        Accepts an optional context for conditional dependencies (e.g. different
+        drivers for different databases). Returned packages are installed alongside
+        the framework's base dependencies.
+        """
+        return []
+
     def required_env(self) -> list[str]:
         """Return environment-variable names this feature expects in ``.env.example``."""
         return []

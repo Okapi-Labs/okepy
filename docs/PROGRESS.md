@@ -1,10 +1,10 @@
 # okapy — Progress Tracker
 
-> Updated: Session 4 — Auth feature complete (LoginView issues tokens, email verification works, JWT utility module)
+> Updated: Session 5 — Infrastructure features (PostgreSQL, Docker, Redis, Celery)
 
 ## Current Phase
 
-**Phase 2 — Docker & Deployment Features** (Starting)
+**Phase 2 — Infrastructure Features** (Completed)
 
 ---
 
@@ -54,13 +54,19 @@
 
 ## Remaining Tasks
 
-### Phase 2 — Docker & Deployment Features
-- [ ] Docker feature (Dockerfile + entrypoint)
-- [ ] Docker Compose feature (app + db + redis + worker)
-- [ ] Celery / Redis features
-- [ ] GitHub Actions CI workflow feature
-- [ ] Storage (S3 / Cloudinary) feature
-- [ ] Deployment configs (Render, Railway, Fly.io)
+### Phase 2 — Infrastructure Features (Session 5)
+- [x] PostgreSQL feature (contrib/db.py with DATABASE_URL parsing, psycopg2 dependency)
+- [x] Redis feature (contrib/redis.py with client helper, redis-py dependency)
+- [x] Celery feature (config/celery.py app, tasks.py, depends on redis, celery dependency)
+- [x] Celery wire — CELERY_* settings in base.py, celery_app import in config/__init__.py
+- [x] Redis wire — REDIS_URL + CACHES config in base.py using RedisCache
+- [x] PostgreSQL wire — DATABASE_URL override block in base.py settings
+- [x] Docker feature (Dockerfile with gunicorn, .dockerignore, docker-entrypoint.sh)
+- [x] Feature-level base_dependencies() contract — features can declare their own PyPI deps
+- [x] Generator deduplicates feature + framework dependencies before installing
+- [x] Feature env vars collected from all installed features into .env.example
+- [x] Database selection automatically implies the correct database feature (postgres/mysql/sqlite)
+- [x] Verified: manage.py check passes with all four features simultaneously
 
 ### Phase 3 — Core Features (Django)
 - [ ] postgres / mysql / sqlite features
@@ -89,18 +95,28 @@
 
 ---
 
-## Files Created/Modified (Session 4)
+## Files Created/Modified (Session 5)
 
 **New:**
-- `src/okapy/features/jwt/templates/jwt.py.jinja` — JWT utility module (create_tokens, default_jwt_settings)
+- `src/okapy/features/postgres/__init__.py` — PostgresFeature (install contrib/db.py, psycopg2 dep)
+- `src/okapy/features/postgres/templates/contrib/__init__.py.jinja`
+- `src/okapy/features/postgres/templates/contrib/db.py.jinja` — DATABASE_URL parser + fallback config
+- `src/okapy/features/redis/__init__.py` — RedisFeature (install contrib/redis.py, redis-py dep)
+- `src/okapy/features/redis/templates/contrib/redis.py.jinja` — Redis client helper
+- `src/okapy/features/celery/__init__.py` — CeleryFeature (depends on redis, installs config/celery.py + tasks.py)
+- `src/okapy/features/celery/templates/celery.py.jinja` — Celery application with autodiscover
+- `src/okapy/features/celery/templates/tasks.py.jinja` — Sample shared_task
+- `src/okapy/features/docker/__init__.py` — DockerFeature (Dockerfile, .dockerignore, entrypoint)
+- `src/okapy/features/docker/templates/Dockerfile.jinja` — Python 3.12-slim + gunicorn
+- `src/okapy/features/docker/templates/.dockerignore.jinja`
+- `src/okapy/features/docker/templates/docker-entrypoint.sh.jinja` — migrate + collectstatic
 
 **Modified:**
-- `src/okapy/features/auth/templates/views.py.jinja` — LoginView issues JWT tokens; RegisterView sends verification email; VerifyEmailView verifies tokens
-- `src/okapy/features/auth/templates/emails.py.jinja` — Token generation via urlsafe_base64_encode + default_token_generator
-- `src/okapy/features/jwt/__init__.py` — install() creates jwt.py utility module in generated project
-
-### Previous sessions
-See Session 3 for original auth scaffold files.
+- `src/okapy/core/feature.py` — Added base_dependencies() to Feature ABC
+- `src/okapy/core/generator.py` — install_deps deduplicates feature + framework deps; _default_env collects env vars from all features
+- `src/okapy/core/config.py` — selected_features auto-includes database feature (postgres/mysql/sqlite)
+- `src/okapy/features/__init__.py` — Registers all four new features
+- `src/okapy/frameworks/django/__init__.py` — Added _wire_postgres, _wire_redis, _wire_celery methods
 
 ---
 
@@ -130,10 +146,4 @@ See Session 3 for original auth scaffold files.
 
 ## Next Recommended Task
 
-**Phase 2 — Docker Feature** — Dockerfile + docker-compose.yml generation for Django projects:
-
-1. Create `src/okapy/features/docker/` with Dockerfile template
-2. Create `src/okapy/features/docker_compose/` with docker-compose.yml template
-3. Register both in `features/__init__.py`
-4. Wire into Django: update .dockerignore, entrypoint, gunicorn config
-5. Test: `okapy create --framework django --defaults` + verify Dockerfile exists
+**Phase 3 — Core Features (Django)** — pytest, docker-compose, swagger/redoc, logging, social auth:

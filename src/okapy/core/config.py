@@ -105,6 +105,15 @@ class ProjectConfig(BaseModel):
             self.testing,
         ):
             names.update(g.value for g in group)
+        # Database-specific feature is implied by the database selection.
+        db_feature = {
+            Database.POSTGRESQL: FeatureName.POSTGRES,
+            Database.MYSQL: FeatureName.MYSQL,
+            Database.SQLITE: FeatureName.SQLITE,
+        }
+        implicit = db_feature.get(self.database)
+        if implicit is not None:
+            names.add(implicit.value)
         # Social is implied when a social auth provider is selected.
         social_providers = {
             AuthProvider.GOOGLE,

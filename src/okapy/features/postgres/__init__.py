@@ -1,0 +1,30 @@
+from __future__ import annotations
+
+from okapy.core.context import ProjectContext
+from okapy.core.feature import Feature
+from okapy.utils.templating import render_template
+
+
+class PostgresFeature(Feature):
+    name = "postgres"
+    label = "PostgreSQL"
+
+    def install(self, context: ProjectContext) -> None:
+        package = context.package_name
+        project_dir = context.project_dir
+        ctx = {"package_name": package}
+
+        contrib_dir = project_dir / package / "contrib"
+        contrib_dir.mkdir(parents=True, exist_ok=True)
+
+        content = render_template("contrib/__init__.py.jinja", ctx)
+        (contrib_dir / "__init__.py").write_text(content, encoding="utf-8")
+
+        content = render_template("contrib/db.py.jinja", ctx)
+        (contrib_dir / "db.py").write_text(content, encoding="utf-8")
+
+    def base_dependencies(self, context: ProjectContext | None = None) -> list[str]:
+        return ["psycopg2-binary>=2.9"]
+
+    def required_env(self) -> list[str]:
+        return ["DATABASE_URL"]

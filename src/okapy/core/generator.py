@@ -45,11 +45,25 @@ class Generator:
         success(f"{framework.label} project scaffolded")
 
     def install_deps(self, framework: Framework) -> None:
-        deps = list(framework.base_dependencies(context=self.context))
+        from okapy.core.registry import get_feature
+
+        seen: set[str] = set()
+        deps: list[str] = []
+        for dep in framework.base_dependencies(context=self.context):
+            if dep not in seen:
+                seen.add(dep)
+                deps.append(dep)
+        for name in self.context.features:
+            feature = get_feature(name)
+            if feature is not None:
+                for dep in feature.base_dependencies(context=self.context):
+                    if dep not in seen:
+                        seen.add(dep)
+                        deps.append(dep)
         if not deps:
-            step("No base dependencies to install")
+            step("No dependencies to install")
             return
-        step(f"Installing base dependencies: {', '.join(deps)}")
+        step(f"Installing dependencies: {', '.join(deps)}")
         if not self.dry_run:
             from okapy.utils.shell import pip_install
 
@@ -123,6 +137,8 @@ class Generator:
 
 
 def _default_env(context: ProjectContext) -> str:
+    from okapy.core.registry import get_feature
+
     cfg = context.config
     lines = [
         "# Django",
@@ -130,7 +146,7 @@ def _default_env(context: ProjectContext) -> str:
         "SECRET_KEY=change-me-to-a-random-secret-key",
         "DEBUG=True",
     ]
-    if cfg.database.value == "postgresql":
+    if context.feature_enabled("postgres") or cfg.database.value == "postgresql":
         lines.extend([
             "",
             "# Database",
@@ -142,7 +158,7 @@ def _default_env(context: ProjectContext) -> str:
             "# Database",
             "DATABASE_URL=mysql://root:root@localhost:3306/" + context.package_name,
         ])
-    if cfg.api_auth:
+    if cfg.api_auth or context.feature_enabled("auth"):
         lines.extend([
             "",
             "# Auth",
@@ -151,11 +167,25 @@ def _default_env(context: ProjectContext) -> str:
             "JWT_ACCESS_TOKEN_LIFETIME=3600",
             "JWT_REFRESH_TOKEN_LIFETIME=86400",
         ])
-    if cfg.background_jobs:
+    if context.feature_enabled("redis") or cfg.background_jobs:
         lines.extend([
             "",
-            "# Redis / Celery",
+            "# Redis",
             "REDIS_URL=redis://localhost:6379/0",
-            "CELERY_BROKER_URL=redis://localhost:6379/0",
         ])
+    if context.feature_enabled("celery") or cfg.background_jobs:
+        lines.extend([
+            "",
+            "# Celery",
+            "CELERY_BROKER_URL=redis://localhost:6379/0",
+            "CELERY_RESULT_BACKEND=redis://localhost:6379/0",
+        ])
+    existing = {line.split("=", 1)[0] for line in lines if "=" in line}
+    for name in context.features:
+        feature = get_feature(name)
+        if feature is not None:
+            for var in feature.required_env():
+                if var not in existing:
+                    lines.append(f"{var}=")
+                    existing.add(var)
     return "\n".join(lines) + "\n"
