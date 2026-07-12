@@ -173,6 +173,23 @@ def _default_env(context: ProjectContext) -> str:
             "# Redis",
             "REDIS_URL=redis://localhost:6379/0",
         ])
+    if context.feature_enabled("s3"):
+        lines.extend([
+            "",
+            "# AWS S3",
+            "AWS_ACCESS_KEY_ID=",
+            "AWS_SECRET_ACCESS_KEY=",
+            "AWS_STORAGE_BUCKET_NAME=",
+            "AWS_S3_REGION_NAME=us-east-1",
+        ])
+    if context.feature_enabled("cloudinary"):
+        lines.extend([
+            "",
+            "# Cloudinary",
+            "CLOUDINARY_CLOUD_NAME=",
+            "CLOUDINARY_API_KEY=",
+            "CLOUDINARY_API_SECRET=",
+        ])
     if context.feature_enabled("social"):
         lines.extend([
             "",
