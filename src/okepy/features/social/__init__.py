@@ -11,12 +11,11 @@ class SocialFeature(Feature):
     dependencies = frozenset({"auth"})
 
     def install(self, context: ProjectContext) -> None:
-        package = context.package_name
         project_dir = context.project_dir
-        app_dir = project_dir / package / "social_auth"
+        app_dir = project_dir / "social_auth"
         app_dir.mkdir(parents=True, exist_ok=True)
 
-        ctx = {"package_name": package}
+        ctx = {"package_name": context.package_name}
 
         files = {
             "__init__.py": "social/__init__.py.jinja",
