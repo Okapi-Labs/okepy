@@ -104,16 +104,28 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+{% if project_type in ('api', 'hybrid') %}
 REST_FRAMEWORK = {
+    {%- if auth_enabled %}
+    # Auth feature selected — new DRF views default to IsAuthenticated + JWT.
+    # Override per-view with ``permission_classes`` / ``authentication_classes``.
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
+    {%- else %}
+    # No auth feature selected — all endpoints open by default.
+    "DEFAULT_AUTHENTICATION_CLASSES": (),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.AllowAny",
+    ),
+    {%- endif %}
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
 }
+{% endif %}
 
 CORS_ALLOWED_ORIGINS = config(
     "CORS_ALLOWED_ORIGINS",
