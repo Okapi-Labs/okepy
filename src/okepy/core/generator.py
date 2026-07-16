@@ -166,6 +166,12 @@ def _default_env(context: ProjectContext) -> str:
             "JWT_ALGORITHM=HS256",
             "JWT_ACCESS_TOKEN_LIFETIME=3600",
             "JWT_REFRESH_TOKEN_LIFETIME=86400",
+            "EMAIL_HOST=localhost",
+            "EMAIL_PORT=1025",
+            "EMAIL_HOST_USER=",
+            "EMAIL_HOST_PASSWORD=",
+            "FRONTEND_URL=http://localhost:3000",
+            f"SITE_NAME={context.name}",
         ])
     if context.feature_enabled("redis") or cfg.background_jobs:
         lines.extend([
