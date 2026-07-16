@@ -234,15 +234,14 @@ CELERY_TIMEZONE = "UTC"
     @staticmethod
     def _wire_social(context: ProjectContext) -> None:
         project_dir = context.project_dir
-        pkg = context.package_name
 
-        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        settings_path = project_dir / "config" / "settings" / "base.py"
         if settings_path.exists():
             content = settings_path.read_text(encoding="utf-8")
 
-            if f'"{pkg}.social_auth"' not in content:
+            if '"social_auth"' not in content:
                 marker = "INSTALLED_APPS = ["
-                insert = f'    "{pkg}.social_auth",\n'
+                insert = '    "social_auth",\n'
                 content = content.replace(marker, marker + "\n" + insert)
 
             if "social_django" not in content:
@@ -274,10 +273,10 @@ SOCIAL_AUTH_USER_MODEL = "users.User"
 
             settings_path.write_text(content, encoding="utf-8")
 
-        urls_path = project_dir / pkg / "config" / "urls.py"
+        urls_path = project_dir / "config" / "urls.py"
         if urls_path.exists():
             content = urls_path.read_text(encoding="utf-8")
-            auth_social = f"path('auth/social/', include('{pkg}.social_auth.urls')),"
+            auth_social = "path('auth/social/', include('social_auth.urls')),"
             if auth_social not in content:
                 marker = "urlpatterns = ["
                 insert = f"    {auth_social}\n"
@@ -287,8 +286,7 @@ SOCIAL_AUTH_USER_MODEL = "users.User"
     @staticmethod
     def _wire_s3(context: ProjectContext) -> None:
         project_dir = context.project_dir
-        pkg = context.package_name
-        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        settings_path = project_dir / "config" / "settings" / "base.py"
         if not settings_path.exists():
             return
         content = settings_path.read_text(encoding="utf-8")
@@ -311,8 +309,7 @@ AWS_S3_SIGNATURE_VERSION = "s3v4"
     @staticmethod
     def _wire_cloudinary(context: ProjectContext) -> None:
         project_dir = context.project_dir
-        pkg = context.package_name
-        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        settings_path = project_dir / "config" / "settings" / "base.py"
         if not settings_path.exists():
             return
         content = settings_path.read_text(encoding="utf-8")
