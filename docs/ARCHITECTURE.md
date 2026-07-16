@@ -132,6 +132,24 @@ Templates are loaded from two locations, searched in order:
 
 Template names use the `.jinja` extension (e.g., `models.py.jinja`). The `.jinja` suffix is stripped on write so generated files have normal extensions.
 
+## Django adapter conventions
+
+### Default DRF permission policy
+
+The scaffolded `config/settings/base.py.jinja` template sets `REST_FRAMEWORK`
+`DEFAULT_PERMISSION_CLASSES` and `DEFAULT_AUTHENTICATION_CLASSES` based on
+whether the `auth` feature is selected (`auth_enabled` in the template context):
+
+| Auth enabled | `DEFAULT_PERMISSION_CLASSES` | `DEFAULT_AUTHENTICATION_CLASSES` |
+|---|---|---|
+| Yes | `IsAuthenticated` | `JWTAuthentication` |
+| No  | `AllowAny` | `()` (empty) |
+
+This means a bare Django API scaffold (no auth provider picked) will **not**
+silently lock every DRF view behind a non-existent auth scheme. Per-view
+overrides with `permission_classes` / `authentication_classes` always take
+precedence regardless of this default.
+
 ## Design principles
 
 - **Isolation**: a feature must not edit unrelated features' files
