@@ -233,3 +233,32 @@ def test_social_auto_includes_auth_and_jwt_transitive(tmp_path):
     assert "auth" in resolved
     assert "social" in resolved
     assert resolved.index("jwt") < resolved.index("auth") < resolved.index("social")
+
+
+def test_email_settings_use_config_not_hardcoded(django_framework):
+    """EMAIL settings in base.py should use decouple.config(), not literals."""
+    target = _project_dir("email-config-test")
+    _cleanup(target)
+    cfg = default_config("email-config-test")
+    cfg.framework = Framework.DJANGO
+    ctx = build_context(cfg, base_dir=target.parent)
+    django_framework.scaffold(ctx)
+
+    # Wire auth to inject the email block
+    django_framework.wire(ctx)
+
+    settings = ctx.project_dir / "config" / "settings" / "base.py"
+    content = settings.read_text()
+
+    # Every email setting should use config(...), not a bare literal
+    assert 'config("EMAIL_BACKEND"' in content
+    assert 'config("EMAIL_HOST"' in content
+    assert 'config("EMAIL_PORT"' in content
+    assert 'config("EMAIL_HOST_USER"' in content
+    assert 'config("EMAIL_HOST_PASSWORD"' in content
+    assert 'config("EMAIL_USE_TLS"' in content
+    assert 'config("DEFAULT_FROM_EMAIL"' in content
+    assert 'config("SITE_NAME"' in content
+    assert 'config("FRONTEND_URL"' in content
+    assert "django.core.mail.backends.console.EmailBackend" in content
+    _cleanup(target)
