@@ -43,7 +43,11 @@ def load_features() -> list:
             if isinstance(candidate, Feature):
                 register_feature(candidate)
                 loaded.append(candidate)
-            elif isinstance(candidate, type) and issubclass(candidate, Feature) and candidate is not Feature:
+            elif (
+                isinstance(candidate, type)
+                and issubclass(candidate, Feature)
+                and candidate is not Feature
+            ):
                 instance = candidate()
                 register_feature(instance)
                 loaded.append(instance)
@@ -61,7 +65,11 @@ def load_frameworks() -> list:
             if isinstance(candidate, Framework):
                 register_framework(candidate)
                 loaded.append(candidate)
-            elif isinstance(candidate, type) and issubclass(candidate, Framework) and candidate is not Framework:
+            elif (
+                isinstance(candidate, type)
+                and issubclass(candidate, Framework)
+                and candidate is not Framework
+            ):
                 instance = candidate()
                 register_framework(instance)
                 loaded.append(instance)
@@ -91,6 +99,7 @@ def _iter_candidates(obj) -> list:
         return [
             v
             for v in vars(obj).values()
-            if isinstance(v, type) and (issubclass(v, (Feature, Framework)) and v not in (Feature, Framework))
+            if isinstance(v, type)
+            and (issubclass(v, (Feature, Framework)) and v not in (Feature, Framework))
         ]
     return [obj]

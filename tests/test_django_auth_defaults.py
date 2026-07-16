@@ -23,8 +23,8 @@ from okepy.core.config import (
     default_config,
 )
 from okepy.core.context import build_context
-from okepy.frameworks.django import DjangoFramework
 from okepy.features import AuthFeature, JWTFeature, RedisFeature, RefreshTokenFeature  # noqa: F401
+from okepy.frameworks.django import DjangoFramework
 
 
 @pytest.fixture
@@ -39,6 +39,7 @@ def _project_dir(name: str) -> Path:
 def _cleanup(path: Path) -> None:
     if path.exists():
         import shutil
+
         shutil.rmtree(path)
 
 
@@ -84,13 +85,15 @@ def test_no_auth_scaffold_uses_allowany(django_framework):
     content = settings.read_text()
     assert "AllowAny" in content
     assert "IsAuthenticated" not in content
-    assert '"DEFAULT_AUTHENTICATION_CLASSES": ()' in content or '"DEFAULT_AUTHENTICATION_CLASSES": ()' in content
+    assert (
+        '"DEFAULT_AUTHENTICATION_CLASSES": ()' in content
+        or '"DEFAULT_AUTHENTICATION_CLASSES": ()' in content
+    )
     _cleanup(target)
 
 
 def test_no_auth_health_check_accessible(tmp_path):
     """Generate a Django project without auth, run manage.py check -> exit 0."""
-    target = tmp_path / "no-auth-health"
     cfg = ProjectConfig(
         name="no-auth-health",
         project_type=ProjectType.API,
@@ -134,6 +137,7 @@ def ctx_no_auth():
 
 def test_default_env_includes_email_vars_when_auth_enabled(ctx_with_auth):
     from okepy.core.generator import _default_env
+
     env = _default_env(ctx_with_auth)
     assert "EMAIL_HOST=localhost" in env
     assert "EMAIL_PORT=1025" in env
@@ -145,6 +149,7 @@ def test_default_env_includes_email_vars_when_auth_enabled(ctx_with_auth):
 def test_default_env_redir_url_appears_once(ctx_with_auth):
     """REDIS_URL should appear exactly once even with redis+celery selected."""
     from okepy.core.generator import _default_env
+
     env = _default_env(ctx_with_auth)
     # Default config includes both redis and celery
     count = env.count("REDIS_URL")
@@ -153,6 +158,7 @@ def test_default_env_redir_url_appears_once(ctx_with_auth):
 
 def test_default_env_no_auth_omits_jwt_vars(ctx_no_auth):
     from okepy.core.generator import _default_env
+
     env = _default_env(ctx_no_auth)
     assert "JWT_SECRET_KEY" not in env
     assert "EMAIL_HOST" not in env
@@ -160,10 +166,10 @@ def test_default_env_no_auth_omits_jwt_vars(ctx_no_auth):
 
 # --- dependency resolution integration tests -------------------------------
 
+
 def test_celery_only_auto_includes_redis_files(tmp_path):
     """Scaffolding with only 'celery' selected should generate contrib/redis.py."""
     from okepy.core.registry import order_features
-    from okepy.features import RedisFeature
 
     cfg = ProjectConfig(
         name="celery-only",
@@ -189,7 +195,6 @@ def test_celery_only_auto_includes_redis_files(tmp_path):
 def test_auth_only_auto_includes_jwt(tmp_path):
     """Selecting only auth should auto-include jwt and generate jwt.py."""
     from okepy.core.registry import order_features
-    from okepy.features import JWTFeature
 
     cfg = ProjectConfig(
         name="auth-only",
@@ -213,7 +218,6 @@ def test_auth_only_auto_includes_jwt(tmp_path):
 def test_social_auto_includes_auth_and_jwt_transitive(tmp_path):
     """Social should auto-include auth and jwt (transitive via auth)."""
     from okepy.core.registry import order_features
-    from okepy.features import AuthFeature, JWTFeature
 
     cfg = ProjectConfig(
         name="social-only",

@@ -20,9 +20,7 @@ class FlaskFramework(Framework):
         )
 
     def wire(self, context: ProjectContext) -> None:
-        raise NotImplementedError(
-            "Flask feature wiring is not implemented yet (planned: Phase 7)."
-        )
+        raise NotImplementedError("Flask feature wiring is not implemented yet (planned: Phase 7).")
 
     def base_dependencies(self, context=None) -> list[str]:
         return ["flask"]

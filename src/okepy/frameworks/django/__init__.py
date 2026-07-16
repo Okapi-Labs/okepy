@@ -39,27 +39,69 @@ class DjangoFramework(Framework):
         self._gitignore(project_dir)
 
         self._render("django/config/__init__.py.jinja", project_dir / "config" / "__init__.py", ctx)
-        self._render("django/config/settings/__init__.py.jinja", project_dir / "config" / "settings" / "__init__.py", ctx)
-        self._render("django/config/settings/base.py.jinja", project_dir / "config" / "settings" / "base.py", ctx)
-        self._render("django/config/settings/local.py.jinja", project_dir / "config" / "settings" / "local.py", ctx)
-        self._render("django/config/settings/production.py.jinja", project_dir / "config" / "settings" / "production.py", ctx)
+        self._render(
+            "django/config/settings/__init__.py.jinja",
+            project_dir / "config" / "settings" / "__init__.py",
+            ctx,
+        )
+        self._render(
+            "django/config/settings/base.py.jinja",
+            project_dir / "config" / "settings" / "base.py",
+            ctx,
+        )
+        self._render(
+            "django/config/settings/local.py.jinja",
+            project_dir / "config" / "settings" / "local.py",
+            ctx,
+        )
+        self._render(
+            "django/config/settings/production.py.jinja",
+            project_dir / "config" / "settings" / "production.py",
+            ctx,
+        )
         self._render("django/config/urls.py.jinja", project_dir / "config" / "urls.py", ctx)
         self._render("django/config/wsgi.py.jinja", project_dir / "config" / "wsgi.py", ctx)
         self._render("django/config/asgi.py.jinja", project_dir / "config" / "asgi.py", ctx)
 
         if cfg.project_type in (ProjectType.API, ProjectType.HYBRID):
-            self._render("django/apps/api/__init__.py.jinja", project_dir / "apps" / "api" / "__init__.py", ctx)
-            self._render("django/apps/api/apps.py.jinja", project_dir / "apps" / "api" / "apps.py", ctx)
-            self._render("django/apps/api/views.py.jinja", project_dir / "apps" / "api" / "views.py", ctx)
-            self._render("django/apps/api/serializers.py.jinja", project_dir / "apps" / "api" / "serializers.py", ctx)
-            self._render("django/apps/api/urls.py.jinja", project_dir / "apps" / "api" / "urls.py", ctx)
-            self._render("django/apps/api/admin.py.jinja", project_dir / "apps" / "api" / "admin.py", ctx)
+            self._render(
+                "django/apps/api/__init__.py.jinja",
+                project_dir / "apps" / "api" / "__init__.py",
+                ctx,
+            )
+            self._render(
+                "django/apps/api/apps.py.jinja", project_dir / "apps" / "api" / "apps.py", ctx
+            )
+            self._render(
+                "django/apps/api/views.py.jinja", project_dir / "apps" / "api" / "views.py", ctx
+            )
+            self._render(
+                "django/apps/api/serializers.py.jinja",
+                project_dir / "apps" / "api" / "serializers.py",
+                ctx,
+            )
+            self._render(
+                "django/apps/api/urls.py.jinja", project_dir / "apps" / "api" / "urls.py", ctx
+            )
+            self._render(
+                "django/apps/api/admin.py.jinja", project_dir / "apps" / "api" / "admin.py", ctx
+            )
 
         if cfg.project_type in (ProjectType.SSR, ProjectType.HYBRID):
-            self._render("django/apps/web/__init__.py.jinja", project_dir / "apps" / "web" / "__init__.py", ctx)
-            self._render("django/apps/web/apps.py.jinja", project_dir / "apps" / "web" / "apps.py", ctx)
-            self._render("django/apps/web/views.py.jinja", project_dir / "apps" / "web" / "views.py", ctx)
-            self._render("django/apps/web/urls.py.jinja", project_dir / "apps" / "web" / "urls.py", ctx)
+            self._render(
+                "django/apps/web/__init__.py.jinja",
+                project_dir / "apps" / "web" / "__init__.py",
+                ctx,
+            )
+            self._render(
+                "django/apps/web/apps.py.jinja", project_dir / "apps" / "web" / "apps.py", ctx
+            )
+            self._render(
+                "django/apps/web/views.py.jinja", project_dir / "apps" / "web" / "views.py", ctx
+            )
+            self._render(
+                "django/apps/web/urls.py.jinja", project_dir / "apps" / "web" / "urls.py", ctx
+            )
             write_text(
                 project_dir / "apps" / "web" / "templates" / "web" / "home.html",
                 render_template("django/apps/web/templates/web/home.html", ctx),

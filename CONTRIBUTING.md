@@ -18,7 +18,7 @@ Be respectful, inclusive, and constructive. We follow the [Python Community Code
 - **One phase per session.** We use a phased roadmap (`docs/ROADMAP.md`). Do not start later phases before earlier ones are complete.
 - **Update `docs/PROGRESS.md`** after each session.
 - **Write tests** for new code. We aim for good coverage on core abstractions.
-- **Run `ruff`** before committing: `uv run ruff check src/ tests/`
+- **Run `ruff`** before committing: `uv run ruff check src/ tests/ && uv run ruff format --check src/ tests/`
 - **Use type hints** everywhere. We target Python 3.10+.
 - **Keep features isolated.** A `Feature` should only touch its own files.
 - **No secrets in code.** Generate `.env.example` with placeholders only.
@@ -126,7 +126,11 @@ All generated projects must pass `python manage.py check` for Django and equival
 3. Run tests and linting
 4. Update `docs/PROGRESS.md` if needed
 5. Open a pull request with a clear description of what you changed and why
-6. Ensure CI passes
+6. Ensure CI passes (all status checks green). The following status checks **must** be
+   configured as required in the GitHub repo settings (Settings → Branches → Branch
+   protection rules for `main`):
+   - `lint (3.10)`, `lint (3.11)`, `lint (3.12)`
+   - `integration-slow`
 
 ## Questions?
 

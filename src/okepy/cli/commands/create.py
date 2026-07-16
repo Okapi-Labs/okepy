@@ -28,12 +28,18 @@ _create = typer.Typer(help="Create a new Python backend project.")
 @_create.callback(invoke_without_command=True)
 def create(
     name: str | None = typer.Option(None, "--name", "-n", help="Project name."),
-    framework: Framework = typer.Option(Framework.FASTAPI, "--framework", "-f", help="Target framework."),
+    framework: Framework = typer.Option(
+        Framework.FASTAPI, "--framework", "-f", help="Target framework."
+    ),
     project_type: str = typer.Option("api", "--type", help="api | ssr | hybrid."),
     database: str = typer.Option("postgresql", "--db", help="postgresql | mysql | sqlite."),
     deployment: str = typer.Option("none", "--deploy", help="render | railway | fly | none."),
-    defaults: bool = typer.Option(False, "--defaults", help="Use sensible default selections (non-interactive)."),
-    non_interactive: bool = typer.Option(False, "--yes", "-y", help="Skip prompts; requires --name (or uses defaults)."),
+    defaults: bool = typer.Option(
+        False, "--defaults", help="Use sensible default selections (non-interactive)."
+    ),
+    non_interactive: bool = typer.Option(
+        False, "--yes", "-y", help="Skip prompts; requires --name (or uses defaults)."
+    ),
     dry_run: bool = typer.Option(False, "--dry-run", help="Plan only; do not write files."),
     force: bool = typer.Option(False, "--force", help="Allow writing into a non-empty directory."),
     target: Path = typer.Option(Path.cwd(), "--target", help="Base directory for the new project."),
@@ -42,12 +48,19 @@ def create(
     banner()
     _bootstrap_plugins()
 
-    config = _resolve_config(name, framework, project_type, database, deployment, defaults, non_interactive)
+    config = _resolve_config(
+        name, framework, project_type, database, deployment, defaults, non_interactive
+    )
 
     context = build_context(config, base_dir=target)
     _print_summary(context)
 
-    if context.project_dir.exists() and any(context.project_dir.iterdir()) and not force and not dry_run:
+    if (
+        context.project_dir.exists()
+        and any(context.project_dir.iterdir())
+        and not force
+        and not dry_run
+    ):
         error(
             f"Target directory already exists and is not empty: {context.project_dir}\n"
             "Use --force to overwrite or choose a different project name."
@@ -66,7 +79,9 @@ def _bootstrap_plugins() -> None:
         step(f"Loaded plugins: {len(loaded_f)} feature(s), {len(loaded_fw)} framework(s).")
 
 
-def _resolve_config(name, framework, project_type, database, deployment, defaults, non_interactive) -> ProjectConfig:
+def _resolve_config(
+    name, framework, project_type, database, deployment, defaults, non_interactive
+) -> ProjectConfig:
     from okepy.cli.wizard import run_wizard
     from okepy.core.config import Database as DbEnum
     from okepy.core.config import Deployment as DepEnum

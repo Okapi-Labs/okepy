@@ -38,13 +38,30 @@ def _venv_python(project_dir: Path) -> Path:
 
 def pip_install(project_dir: Path, *packages: str, backend: str = "uv") -> None:
     if backend == "uv":
-        run(["uv", "pip", "install", "--python", str(_venv_python(project_dir)), *packages], cwd=project_dir)
+        run(
+            ["uv", "pip", "install", "--python", str(_venv_python(project_dir)), *packages],
+            cwd=project_dir,
+        )
     else:
         run([str(_venv_python(project_dir)), "-m", "pip", "install", *packages], cwd=project_dir)
 
 
 def install_requirements(project_dir: Path, req_file: Path, backend: str = "uv") -> None:
     if backend == "uv":
-        run(["uv", "pip", "install", "--python", str(_venv_python(project_dir)), "-r", str(req_file)], cwd=project_dir)
+        run(
+            [
+                "uv",
+                "pip",
+                "install",
+                "--python",
+                str(_venv_python(project_dir)),
+                "-r",
+                str(req_file),
+            ],
+            cwd=project_dir,
+        )
     else:
-        run([str(_venv_python(project_dir)), "-m", "pip", "install", "-r", str(req_file)], cwd=project_dir)
+        run(
+            [str(_venv_python(project_dir)), "-m", "pip", "install", "-r", str(req_file)],
+            cwd=project_dir,
+        )

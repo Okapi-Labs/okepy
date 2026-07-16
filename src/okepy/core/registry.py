@@ -18,6 +18,7 @@ _FEATURES: dict[str, Feature] = {}
 
 # --- frameworks ---------------------------------------------------------
 
+
 def register_framework(framework: Framework) -> None:
     _FRAMEWORKS[framework.name] = framework
 
@@ -26,9 +27,7 @@ def get_framework(name: str) -> Framework:
     try:
         return _FRAMEWORKS[name]
     except KeyError:
-        raise LookupError(
-            f"Unknown framework '{name}'. Known: {sorted(_FRAMEWORKS)}"
-        ) from None
+        raise LookupError(f"Unknown framework '{name}'. Known: {sorted(_FRAMEWORKS)}") from None
 
 
 def list_frameworks() -> list[Framework]:
@@ -36,6 +35,7 @@ def list_frameworks() -> list[Framework]:
 
 
 # --- features -----------------------------------------------------------
+
 
 def register_feature(feature: Feature) -> None:
     _FEATURES[feature.name] = feature
@@ -54,6 +54,7 @@ def feature_names() -> list[str]:
 
 
 # --- ordering -----------------------------------------------------------
+
 
 def _resolve_closure(names: list[str]) -> list[str]:
     """Expand *names* to include transitive feature dependencies.
@@ -94,7 +95,11 @@ def order_features(names: Iterable[str], framework: Framework | None = None) -> 
     expanded = _resolve_closure(requested)
     for name in expanded:
         if name not in set(requested):
-            dep_of = {n for n in expanded if name in (get_feature(n).dependencies if get_feature(n) else ())}
+            dep_of = {
+                n
+                for n in expanded
+                if name in (get_feature(n).dependencies if get_feature(n) else ())
+            }
             for parent in dep_of:
                 step(f"Auto-including '{name}' (required by '{parent}')")
 
@@ -112,7 +117,7 @@ def order_features(names: Iterable[str], framework: Framework | None = None) -> 
         if state == 2:
             return
         if state == 1:
-            cycle = " -> ".join(stack[stack.index(node):] + [node])
+            cycle = " -> ".join(stack[stack.index(node) :] + [node])
             raise ValueError(f"Feature dependency cycle detected: {cycle}")
         visited[node] = 1
         for dep in graph.get(node, ()):

@@ -7,7 +7,9 @@ from okepy.utils.console import step, success
 
 
 class Generator:
-    def __init__(self, context: ProjectContext, dry_run: bool = False, skip_environment_setup: bool = False) -> None:
+    def __init__(
+        self, context: ProjectContext, dry_run: bool = False, skip_environment_setup: bool = False
+    ) -> None:
         self.context = context
         self.dry_run = dry_run
         self.skip_environment_setup = skip_environment_setup
@@ -108,7 +110,9 @@ class Generator:
         if not self.dry_run:
             env_path = self.context.project_dir / ".env.example"
             env_path.parent.mkdir(parents=True, exist_ok=True)
-            env_path.write_text(_default_env(self.context, self._resolved_features(self._framework())))
+            env_path.write_text(
+                _default_env(self.context, self._resolved_features(self._framework()))
+            )
 
     def finalize(self) -> None:
         project_dir = self.context.project_dir
@@ -157,73 +161,89 @@ def _default_env(context: ProjectContext, resolved_features: list[str] | None = 
         "DEBUG=True",
     ]
     if context.feature_enabled("postgres") or cfg.database.value == "postgresql":
-        lines.extend([
-            "",
-            "# Database",
-            "DATABASE_URL=postgres://postgres:postgres@localhost:5432/" + context.package_name,
-        ])
+        lines.extend(
+            [
+                "",
+                "# Database",
+                "DATABASE_URL=postgres://postgres:postgres@localhost:5432/" + context.package_name,
+            ]
+        )
     elif cfg.database.value == "mysql":
-        lines.extend([
-            "",
-            "# Database",
-            "DATABASE_URL=mysql://root:root@localhost:3306/" + context.package_name,
-        ])
+        lines.extend(
+            [
+                "",
+                "# Database",
+                "DATABASE_URL=mysql://root:root@localhost:3306/" + context.package_name,
+            ]
+        )
     if cfg.api_auth or context.feature_enabled("auth"):
-        lines.extend([
-            "",
-            "# Auth",
-            "JWT_SECRET_KEY=change-me",
-            "JWT_ALGORITHM=HS256",
-            "JWT_ACCESS_TOKEN_LIFETIME=3600",
-            "JWT_REFRESH_TOKEN_LIFETIME=86400",
-            "EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend",
-            "EMAIL_HOST=localhost",
-            "EMAIL_PORT=1025",
-            "EMAIL_HOST_USER=",
-            "EMAIL_HOST_PASSWORD=",
-            "EMAIL_USE_TLS=False",
-            "FRONTEND_URL=http://localhost:3000",
-            f"SITE_NAME={context.name}",
-        ])
+        lines.extend(
+            [
+                "",
+                "# Auth",
+                "JWT_SECRET_KEY=change-me",
+                "JWT_ALGORITHM=HS256",
+                "JWT_ACCESS_TOKEN_LIFETIME=3600",
+                "JWT_REFRESH_TOKEN_LIFETIME=86400",
+                "EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend",
+                "EMAIL_HOST=localhost",
+                "EMAIL_PORT=1025",
+                "EMAIL_HOST_USER=",
+                "EMAIL_HOST_PASSWORD=",
+                "EMAIL_USE_TLS=False",
+                "FRONTEND_URL=http://localhost:3000",
+                f"SITE_NAME={context.name}",
+            ]
+        )
     if context.feature_enabled("redis") or cfg.background_jobs:
-        lines.extend([
-            "",
-            "# Redis",
-            "REDIS_URL=redis://localhost:6379/0",
-        ])
+        lines.extend(
+            [
+                "",
+                "# Redis",
+                "REDIS_URL=redis://localhost:6379/0",
+            ]
+        )
     if context.feature_enabled("s3"):
-        lines.extend([
-            "",
-            "# AWS S3",
-            "AWS_ACCESS_KEY_ID=",
-            "AWS_SECRET_ACCESS_KEY=",
-            "AWS_STORAGE_BUCKET_NAME=",
-            "AWS_S3_REGION_NAME=us-east-1",
-        ])
+        lines.extend(
+            [
+                "",
+                "# AWS S3",
+                "AWS_ACCESS_KEY_ID=",
+                "AWS_SECRET_ACCESS_KEY=",
+                "AWS_STORAGE_BUCKET_NAME=",
+                "AWS_S3_REGION_NAME=us-east-1",
+            ]
+        )
     if context.feature_enabled("cloudinary"):
-        lines.extend([
-            "",
-            "# Cloudinary",
-            "CLOUDINARY_CLOUD_NAME=",
-            "CLOUDINARY_API_KEY=",
-            "CLOUDINARY_API_SECRET=",
-        ])
+        lines.extend(
+            [
+                "",
+                "# Cloudinary",
+                "CLOUDINARY_CLOUD_NAME=",
+                "CLOUDINARY_API_KEY=",
+                "CLOUDINARY_API_SECRET=",
+            ]
+        )
     if context.feature_enabled("social"):
-        lines.extend([
-            "",
-            "# Social Auth",
-            "GOOGLE_CLIENT_ID=",
-            "GOOGLE_CLIENT_SECRET=",
-            "GITHUB_CLIENT_ID=",
-            "GITHUB_CLIENT_SECRET=",
-        ])
+        lines.extend(
+            [
+                "",
+                "# Social Auth",
+                "GOOGLE_CLIENT_ID=",
+                "GOOGLE_CLIENT_SECRET=",
+                "GITHUB_CLIENT_ID=",
+                "GITHUB_CLIENT_SECRET=",
+            ]
+        )
     if context.feature_enabled("celery") or cfg.background_jobs:
-        lines.extend([
-            "",
-            "# Celery",
-            "CELERY_BROKER_URL=redis://localhost:6379/0",
-            "CELERY_RESULT_BACKEND=redis://localhost:6379/0",
-        ])
+        lines.extend(
+            [
+                "",
+                "# Celery",
+                "CELERY_BROKER_URL=redis://localhost:6379/0",
+                "CELERY_RESULT_BACKEND=redis://localhost:6379/0",
+            ]
+        )
     existing = {line.split("=", 1)[0] for line in lines if "=" in line}
     for name in resolved:
         feature = get_feature(name)

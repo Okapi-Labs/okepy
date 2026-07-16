@@ -168,8 +168,8 @@ wheels = [
 ]
 
 [[package]]
-name = "okapy"
-version = "0.1.0"
+name = "okepy"
+version = "0.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "jinja2" },

@@ -49,13 +49,19 @@ def run_wizard() -> ProjectConfig:
 
     project_type = questionary.select(
         "Project type?",
-        choices=_choices(ProjectType, {ProjectType.API: "API", ProjectType.SSR: "SSR", ProjectType.HYBRID: "Hybrid"}),
+        choices=_choices(
+            ProjectType,
+            {ProjectType.API: "API", ProjectType.SSR: "SSR", ProjectType.HYBRID: "Hybrid"},
+        ),
         style=_PROMPT_STYLE,
     ).ask()
 
     framework = questionary.select(
         "Framework?",
-        choices=_choices(Framework, {Framework.DJANGO: "Django", Framework.FASTAPI: "FastAPI", Framework.FLASK: "Flask"}),
+        choices=_choices(
+            Framework,
+            {Framework.DJANGO: "Django", Framework.FASTAPI: "FastAPI", Framework.FLASK: "Flask"},
+        ),
         style=_PROMPT_STYLE,
     ).ask()
 
@@ -68,68 +74,89 @@ def run_wizard() -> ProjectConfig:
         style=_PROMPT_STYLE,
     ).ask()
 
-    auth_providers: list[str] = questionary.checkbox(
-        "Authentication?",
-        choices=[
-            questionary.Choice("Email/password", AuthProvider.EMAIL_PASSWORD.value),
-            questionary.Choice("Google", AuthProvider.GOOGLE.value),
-            questionary.Choice("GitHub", AuthProvider.GITHUB.value),
-            questionary.Choice("Magic Link", AuthProvider.MAGIC_LINK.value),
-            questionary.Choice("OTP", AuthProvider.OTP.value),
-        ],
-        style=_PROMPT_STYLE,
-    ).ask() or []
+    auth_providers: list[str] = (
+        questionary.checkbox(
+            "Authentication?",
+            choices=[
+                questionary.Choice("Email/password", AuthProvider.EMAIL_PASSWORD.value),
+                questionary.Choice("Google", AuthProvider.GOOGLE.value),
+                questionary.Choice("GitHub", AuthProvider.GITHUB.value),
+                questionary.Choice("Magic Link", AuthProvider.MAGIC_LINK.value),
+                questionary.Choice("OTP", AuthProvider.OTP.value),
+            ],
+            style=_PROMPT_STYLE,
+        ).ask()
+        or []
+    )
 
-    api_auth: list[str] = questionary.checkbox(
-        "API Auth?",
-        choices=[
-            questionary.Choice("JWT", FeatureName.JWT.value),
-            questionary.Choice("Refresh Tokens", FeatureName.REFRESH.value),
-        ],
-        style=_PROMPT_STYLE,
-    ).ask() or []
+    api_auth: list[str] = (
+        questionary.checkbox(
+            "API Auth?",
+            choices=[
+                questionary.Choice("JWT", FeatureName.JWT.value),
+                questionary.Choice("Refresh Tokens", FeatureName.REFRESH.value),
+            ],
+            style=_PROMPT_STYLE,
+        ).ask()
+        or []
+    )
 
-    background_jobs: list[str] = questionary.checkbox(
-        "Background Jobs?",
-        choices=[
-            questionary.Choice("Celery", FeatureName.CELERY.value),
-            questionary.Choice("Redis", FeatureName.REDIS.value),
-        ],
-        style=_PROMPT_STYLE,
-    ).ask() or []
+    background_jobs: list[str] = (
+        questionary.checkbox(
+            "Background Jobs?",
+            choices=[
+                questionary.Choice("Celery", FeatureName.CELERY.value),
+                questionary.Choice("Redis", FeatureName.REDIS.value),
+            ],
+            style=_PROMPT_STYLE,
+        ).ask()
+        or []
+    )
 
-    storage: list[str] = questionary.checkbox(
-        "Storage?",
-        choices=[
-            questionary.Choice("S3", FeatureName.STORAGE.value + ":s3"),
-            questionary.Choice("Cloudinary", FeatureName.STORAGE.value + ":cloudinary"),
-        ],
-        style=_PROMPT_STYLE,
-    ).ask() or []
+    storage: list[str] = (
+        questionary.checkbox(
+            "Storage?",
+            choices=[
+                questionary.Choice("S3", FeatureName.STORAGE.value + ":s3"),
+                questionary.Choice("Cloudinary", FeatureName.STORAGE.value + ":cloudinary"),
+            ],
+            style=_PROMPT_STYLE,
+        ).ask()
+        or []
+    )
 
-    api_docs: list[str] = questionary.checkbox(
-        "API Docs?",
-        choices=[
-            questionary.Choice("Swagger", FeatureName.SWAGGER.value),
-            questionary.Choice("ReDoc", FeatureName.REDOC.value),
-        ],
-        style=_PROMPT_STYLE,
-    ).ask() or []
+    api_docs: list[str] = (
+        questionary.checkbox(
+            "API Docs?",
+            choices=[
+                questionary.Choice("Swagger", FeatureName.SWAGGER.value),
+                questionary.Choice("ReDoc", FeatureName.REDOC.value),
+            ],
+            style=_PROMPT_STYLE,
+        ).ask()
+        or []
+    )
 
-    docker: list[str] = questionary.checkbox(
-        "Docker?",
-        choices=[
-            questionary.Choice("Docker", FeatureName.DOCKER.value),
-            questionary.Choice("Docker Compose", FeatureName.DOCKER_COMPOSE.value),
-        ],
-        style=_PROMPT_STYLE,
-    ).ask() or []
+    docker: list[str] = (
+        questionary.checkbox(
+            "Docker?",
+            choices=[
+                questionary.Choice("Docker", FeatureName.DOCKER.value),
+                questionary.Choice("Docker Compose", FeatureName.DOCKER_COMPOSE.value),
+            ],
+            style=_PROMPT_STYLE,
+        ).ask()
+        or []
+    )
 
-    testing: list[str] = questionary.checkbox(
-        "Testing?",
-        choices=[questionary.Choice("Pytest", FeatureName.PYTEST.value)],
-        style=_PROMPT_STYLE,
-    ).ask() or []
+    testing: list[str] = (
+        questionary.checkbox(
+            "Testing?",
+            choices=[questionary.Choice("Pytest", FeatureName.PYTEST.value)],
+            style=_PROMPT_STYLE,
+        ).ask()
+        or []
+    )
 
     deployment = questionary.select(
         "Deployment?",

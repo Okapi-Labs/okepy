@@ -67,3 +67,6 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = [
+    "slow: Tests that create a real virtual environment and install dependencies (excluded from the default fast loop with '-m \"not slow\"').",
+]

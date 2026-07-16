@@ -4,20 +4,13 @@ from __future__ import annotations
 
 from okepy.core.feature import Feature
 from okepy.core.registry import (
-    get_framework,
     get_feature,
+    get_framework,
     list_frameworks,
     order_features,
     register_feature,
 )
 from okepy.frameworks import DjangoFramework, FastAPIFramework, FlaskFramework  # noqa: F401
-from okepy.features import (
-    AuthFeature,
-    CeleryFeature,
-    JWTFeature,
-    RedisFeature,
-    SocialFeature,
-)
 
 
 def test_builtin_frameworks_registered():
@@ -47,19 +40,18 @@ def _make_feature(name, deps=()):
 
 
 def test_order_features_respects_dependencies():
-    a = _make_feature("a")
-    b = _make_feature("b", deps={"a"})
-    c = _make_feature("c", deps={"b"})
-    # all deps in input — ordering only
+    _make_feature("a")
+    _make_feature("b", deps={"a"})
+    _make_feature("c", deps={"b"})
     ordered = order_features(["c", "b", "a"])
     assert ordered.index("a") < ordered.index("b") < ordered.index("c")
 
 
 def test_order_features_auto_includes_missing_dependency():
     """Requesting only 'c' should auto-include 'b' and 'a'."""
-    a = _make_feature("auto-a", deps=set())
-    b = _make_feature("auto-b", deps={"auto-a"})
-    c = _make_feature("auto-c", deps={"auto-b"})
+    _make_feature("auto-a", deps=set())
+    _make_feature("auto-b", deps={"auto-a"})
+    _make_feature("auto-c", deps={"auto-b"})
     ordered = order_features(["auto-c"])
     assert "auto-a" in ordered
     assert "auto-b" in ordered
@@ -73,6 +65,7 @@ def test_order_features_handles_unknown_names():
 
 
 # --- real feature dependency tests ---------------------------------------
+
 
 def test_celery_auto_includes_redis():
     """Selecting only 'celery' should auto-include 'redis'."""

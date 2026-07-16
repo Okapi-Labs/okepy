@@ -55,12 +55,18 @@ def banner() -> None:
 
 def spinner(label: str):
     """Context manager yielding a Rich progress spinner."""
-    return Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        console=console,
-        transient=True,
-    ).start().__enter__() if False else _Spinner(label)
+    return (
+        Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+            transient=True,
+        )
+        .start()
+        .__enter__()
+        if False
+        else _Spinner(label)
+    )
 
 
 class _Spinner:

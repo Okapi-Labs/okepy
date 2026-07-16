@@ -145,3 +145,15 @@
 ## Next Recommended Task
 
 **Phase 3 — Core Features (Django)** — pytest, docker-compose, swagger/redoc, logging, github actions:
+
+---
+
+## CI / CD (2026-07-16)
+
+### Added
+- `.github/workflows/ci.yml` — runs on every push/PR to `main`:
+  - `lint` job matrixed over Python 3.10 / 3.11 / 3.12: runs `ruff check`, `ruff format --check`, `pytest -m "not slow"`
+  - `integration-slow` job (Python 3.12 only): runs `pytest -m slow` (real-venv Django integration tests)
+- Existing `workflow.yml` (PyPI publish on release) left untouched.
+- Branch protection docs in CONTRIBUTING.md listing the four required status checks.
+- Fixed pre-existing ruff violations (unused imports, unused variables, import sorting, formatting) so CI would pass from day one.
