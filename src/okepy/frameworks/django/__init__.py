@@ -15,11 +15,10 @@ class DjangoFramework(Framework):
 
     def scaffold(self, context: ProjectContext) -> None:
         project_dir = context.project_dir
-        package = context.package_name
         cfg = context.config
 
         ctx = {
-            "package_name": package,
+            "package_name": context.package_name,
             "project_name": context.name,
             "project_type": cfg.project_type.value,
             "database": cfg.database.value,
