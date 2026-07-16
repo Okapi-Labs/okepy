@@ -23,6 +23,7 @@ class DjangoFramework(Framework):
             "project_type": cfg.project_type.value,
             "database": cfg.database.value,
             "api_auth": bool(cfg.api_auth),
+            "auth_enabled": context.feature_enabled("auth"),
             "background_jobs": bool(cfg.background_jobs),
         }
 
