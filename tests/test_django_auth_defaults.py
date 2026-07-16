@@ -120,3 +120,42 @@ def test_no_auth_health_check_accessible(tmp_path):
         text=True,
     )
     assert result.returncode == 0, f"manage.py check failed:\n{result.stdout}\n{result.stderr}"
+
+
+@pytest.fixture
+def ctx_with_auth():
+    cfg = default_config("testproj")
+    cfg.framework = Framework.DJANGO
+    return build_context(cfg)
+
+
+@pytest.fixture
+def ctx_no_auth():
+    cfg = ProjectConfig(name="testproj", framework=Framework.DJANGO, database=Database.SQLITE)
+    return build_context(cfg)
+
+
+def test_default_env_includes_email_vars_when_auth_enabled(ctx_with_auth):
+    from okepy.core.generator import _default_env
+    env = _default_env(ctx_with_auth)
+    assert "EMAIL_HOST=localhost" in env
+    assert "EMAIL_PORT=1025" in env
+    assert "FRONTEND_URL=http://localhost:3000" in env
+    assert "SITE_NAME=testproj" in env
+    assert "EMAIL_HOST_USER=" in env
+
+
+def test_default_env_redir_url_appears_once(ctx_with_auth):
+    """REDIS_URL should appear exactly once even with redis+celery selected."""
+    from okepy.core.generator import _default_env
+    env = _default_env(ctx_with_auth)
+    # Default config includes both redis and celery
+    count = env.count("REDIS_URL")
+    assert count == 1, f"REDIS_URL appears {count} times, expected 1"
+
+
+def test_default_env_no_auth_omits_jwt_vars(ctx_no_auth):
+    from okepy.core.generator import _default_env
+    env = _default_env(ctx_no_auth)
+    assert "JWT_SECRET_KEY" not in env
+    assert "EMAIL_HOST" not in env
