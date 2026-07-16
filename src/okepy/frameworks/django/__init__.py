@@ -93,15 +93,14 @@ class DjangoFramework(Framework):
     @staticmethod
     def _wire_auth(context: ProjectContext) -> None:
         project_dir = context.project_dir
-        package = context.package_name
 
-        settings_path = project_dir / package / "config" / "settings" / "base.py"
+        settings_path = project_dir / "config" / "settings" / "base.py"
         if settings_path.exists():
             content = settings_path.read_text(encoding="utf-8")
 
-            if f'"{package}.users"' not in content:
+            if '"users"' not in content:
                 marker = "INSTALLED_APPS = ["
-                insert = f'    "{package}.users",\n'
+                insert = '    "users",\n'
                 content = content.replace(marker, marker + "\n" + insert)
 
             if "AUTH_USER_MODEL" not in content:
@@ -134,12 +133,12 @@ FRONTEND_URL = "http://localhost:3000"
 
             settings_path.write_text(content, encoding="utf-8")
 
-        urls_path = project_dir / package / "config" / "urls.py"
+        urls_path = project_dir / "config" / "urls.py"
         if urls_path.exists():
             content = urls_path.read_text(encoding="utf-8")
             if "path('auth/'" not in content:
                 marker = "urlpatterns = ["
-                insert = f"    path('auth/', include('{package}.users.urls')),\n"
+                insert = "    path('auth/', include('users.urls')),\n"
                 content = content.replace(marker, marker + "\n" + insert)
                 urls_path.write_text(content, encoding="utf-8")
 
