@@ -44,6 +44,10 @@ class Generator:
         framework.scaffold(self.context)
         success(f"{framework.label} project scaffolded")
 
+    def _resolved_features(self, framework: Framework) -> list[str]:
+        """Return the full dependency closure via order_features."""
+        return order_features(self.context.features, framework=framework)
+
     def install_deps(self, framework: Framework) -> None:
         from okepy.core.registry import get_feature
 
@@ -53,7 +57,7 @@ class Generator:
             if dep not in seen:
                 seen.add(dep)
                 deps.append(dep)
-        for name in self.context.features:
+        for name in self._resolved_features(framework):
             feature = get_feature(name)
             if feature is not None:
                 for dep in feature.base_dependencies(context=self.context):
@@ -72,7 +76,7 @@ class Generator:
     def install_features(self, framework: Framework) -> None:
         from okepy.core.registry import get_feature
 
-        names = order_features(self.context.features, framework=framework)
+        names = self._resolved_features(framework)
         if not names:
             return
         for name in names:
@@ -99,7 +103,7 @@ class Generator:
         if not self.dry_run:
             env_path = self.context.project_dir / ".env.example"
             env_path.parent.mkdir(parents=True, exist_ok=True)
-            env_path.write_text(_default_env(self.context))
+            env_path.write_text(_default_env(self.context, self._resolved_features(self._framework())))
 
     def finalize(self) -> None:
         project_dir = self.context.project_dir
@@ -136,9 +140,10 @@ class Generator:
         return "uv" if has_uv() else "venv"
 
 
-def _default_env(context: ProjectContext) -> str:
+def _default_env(context: ProjectContext, resolved_features: list[str] | None = None) -> str:
     from okepy.core.registry import get_feature
 
+    resolved = resolved_features or context.features
     cfg = context.config
     lines = [
         "# Django",
@@ -213,7 +218,7 @@ def _default_env(context: ProjectContext) -> str:
             "CELERY_RESULT_BACKEND=redis://localhost:6379/0",
         ])
     existing = {line.split("=", 1)[0] for line in lines if "=" in line}
-    for name in context.features:
+    for name in resolved:
         feature = get_feature(name)
         if feature is not None:
             for var in feature.required_env():

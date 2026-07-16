@@ -94,7 +94,13 @@ class ProjectConfig(BaseModel):
 
     @property
     def selected_features(self) -> list[str]:
-        """Flatten every selected capability into a deduplicated set of feature names."""
+        """Flatten wizard checkbox selections into feature names.
+
+        This is a *user-intent* mapping (checkbox → feature name), NOT a
+        feature-to-feature dependency graph.  Feature dependencies (e.g.
+        ``celery → redis``, ``auth → jwt``) are resolved later by
+        :func:`okepy.core.registry.order_features` and are NOT handled here.
+        """
         names: set[str] = set()
         if self.auth_providers:
             names.add(FeatureName.AUTH.value)
@@ -117,6 +123,9 @@ class ProjectConfig(BaseModel):
         if implicit is not None:
             names.add(implicit.value)
         # Social is implied when a social auth provider is selected.
+        # This is a wizard-intent mapping (a social provider checkbox implies the
+        # social feature) — NOT a feature dependency.  The ``social → auth``
+        # dependency is declared on the SocialFeature class itself.
         social_providers = {
             AuthProvider.GOOGLE,
             AuthProvider.GITHUB,
