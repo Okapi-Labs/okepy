@@ -18,10 +18,10 @@ INSTALLED_APPS = [
 {% if project_type in ('api', 'hybrid') %}
     "rest_framework",
     "corsheaders",
-    "{{ package_name }}.apps.api",
+    "apps.api",
 {% endif -%}
 {%- if project_type in ('ssr', 'hybrid') %}
-    "{{ package_name }}.apps.web",
+    "apps.web",
 {%- endif %}
 ]
 
