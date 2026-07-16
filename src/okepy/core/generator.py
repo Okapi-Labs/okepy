@@ -7,9 +7,10 @@ from okepy.utils.console import step, success
 
 
 class Generator:
-    def __init__(self, context: ProjectContext, dry_run: bool = False) -> None:
+    def __init__(self, context: ProjectContext, dry_run: bool = False, skip_environment_setup: bool = False) -> None:
         self.context = context
         self.dry_run = dry_run
+        self.skip_environment_setup = skip_environment_setup
 
     def generate(self) -> None:
         self.prepare()
@@ -28,6 +29,8 @@ class Generator:
             self.context.project_dir.mkdir(parents=True, exist_ok=True)
 
     def venv(self) -> None:
+        if self.skip_environment_setup:
+            return
         backend = self._detect_venv_backend()
         self.context.venv_backend = backend
         step(f"Creating virtual environment ({backend})")
@@ -49,6 +52,8 @@ class Generator:
         return order_features(self.context.features, framework=framework)
 
     def install_deps(self, framework: Framework) -> None:
+        if self.skip_environment_setup:
+            return
         from okepy.core.registry import get_feature
 
         seen: set[str] = set()
