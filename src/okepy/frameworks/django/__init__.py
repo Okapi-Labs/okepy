@@ -145,8 +145,7 @@ FRONTEND_URL = "http://localhost:3000"
     @staticmethod
     def _wire_postgres(context: ProjectContext) -> None:
         project_dir = context.project_dir
-        pkg = context.package_name
-        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        settings_path = project_dir / "config" / "settings" / "base.py"
         if not settings_path.exists():
             return
         content = settings_path.read_text(encoding="utf-8")
@@ -178,8 +177,7 @@ if _db_url:
     @staticmethod
     def _wire_redis(context: ProjectContext) -> None:
         project_dir = context.project_dir
-        pkg = context.package_name
-        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        settings_path = project_dir / "config" / "settings" / "base.py"
         if not settings_path.exists():
             return
         content = settings_path.read_text(encoding="utf-8")
@@ -204,8 +202,7 @@ CACHES = {
     @staticmethod
     def _wire_celery(context: ProjectContext) -> None:
         project_dir = context.project_dir
-        pkg = context.package_name
-        settings_path = project_dir / pkg / "config" / "settings" / "base.py"
+        settings_path = project_dir / "config" / "settings" / "base.py"
         if not settings_path.exists():
             return
         content = settings_path.read_text(encoding="utf-8")
@@ -226,10 +223,10 @@ CELERY_TIMEZONE = "UTC"
         settings_path.write_text(content, encoding="utf-8")
 
         # Wire celery app into config/__init__.py so it loads on Django startup
-        config_init = project_dir / pkg / "config" / "__init__.py"
+        config_init = project_dir / "config" / "__init__.py"
         if config_init.exists():
             init_content = config_init.read_text(encoding="utf-8")
-            import_line = f"from {pkg}.config.celery import app as celery_app\n"
+            import_line = "from config.celery import app as celery_app\n"
             if import_line not in init_content:
                 init_content = import_line + init_content
                 config_init.write_text(init_content, encoding="utf-8")
