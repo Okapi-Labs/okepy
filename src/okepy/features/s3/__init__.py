@@ -10,12 +10,11 @@ class S3Feature(Feature):
     label = "AWS S3"
 
     def install(self, context: ProjectContext) -> None:
-        package = context.package_name
         project_dir = context.project_dir
-        storage_dir = project_dir / package / "contrib" / "storage"
+        storage_dir = project_dir / "contrib" / "storage"
         storage_dir.mkdir(parents=True, exist_ok=True)
 
-        ctx = {"package_name": package}
+        ctx = {"package_name": context.package_name}
         content = render_template("s3/__init__.py.jinja", ctx)
         (storage_dir / "__init__.py").write_text(content, encoding="utf-8")
 
