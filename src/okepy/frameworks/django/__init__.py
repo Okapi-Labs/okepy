@@ -36,7 +36,6 @@ class DjangoFramework(Framework):
 
         self._render("django/manage.py.jinja", project_dir / "manage.py", ctx)
         self._render("django/requirements.txt.jinja", project_dir / "requirements.txt", ctx)
-        self._render("django/env.example.jinja", project_dir / ".env.example", ctx)
         self._gitignore(project_dir)
 
         self._render("django/config/__init__.py.jinja", project_dir / "config" / "__init__.py", ctx)
