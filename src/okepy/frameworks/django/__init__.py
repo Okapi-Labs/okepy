@@ -119,13 +119,20 @@ SIMPLE_JWT = {
                 content += jwt_block
 
             email_block = f"""
-# Email
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "localhost"
-EMAIL_PORT = 1025
-DEFAULT_FROM_EMAIL = "noreply@example.com"
-SITE_NAME = "{context.name}"
-FRONTEND_URL = "http://localhost:3000"
+# Email — all values read from environment; defaults work for local dev.
+# Override EMAIL_BACKEND, EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER,
+# EMAIL_HOST_PASSWORD, EMAIL_USE_TLS at runtime via .env or the shell.
+from decouple import config
+
+EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = config("EMAIL_HOST", default="localhost")
+EMAIL_PORT = config("EMAIL_PORT", default=1025, cast=int)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False, cast=bool)
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@example.com")
+SITE_NAME = config("SITE_NAME", default="{context.name}")
+FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
 """
             if "EMAIL_BACKEND" not in content:
                 content += email_block
