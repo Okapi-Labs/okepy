@@ -10,11 +10,10 @@ class RedisFeature(Feature):
     label = "Redis"
 
     def install(self, context: ProjectContext) -> None:
-        package = context.package_name
         project_dir = context.project_dir
-        ctx = {"package_name": package}
+        ctx = {"package_name": context.package_name}
 
-        contrib_dir = project_dir / package / "contrib"
+        contrib_dir = project_dir / "contrib"
         contrib_dir.mkdir(parents=True, exist_ok=True)
 
         content = render_template("contrib/__init__.py.jinja", ctx)
