@@ -24,10 +24,7 @@ from okepy.core.config import (
 )
 from okepy.core.context import build_context
 from okepy.frameworks.django import DjangoFramework
-from okepy.features import AuthFeature, JWTFeature, RefreshTokenFeature  # noqa: F401
-
-# Import frameworks to register adapters
-from okepy.frameworks import DjangoFramework  # noqa: F811
+from okepy.features import AuthFeature, JWTFeature, RedisFeature, RefreshTokenFeature  # noqa: F401
 
 
 @pytest.fixture
@@ -159,3 +156,80 @@ def test_default_env_no_auth_omits_jwt_vars(ctx_no_auth):
     env = _default_env(ctx_no_auth)
     assert "JWT_SECRET_KEY" not in env
     assert "EMAIL_HOST" not in env
+
+
+# --- dependency resolution integration tests -------------------------------
+
+def test_celery_only_auto_includes_redis_files(tmp_path):
+    """Scaffolding with only 'celery' selected should generate contrib/redis.py."""
+    from okepy.core.registry import order_features
+    from okepy.features import RedisFeature
+
+    cfg = ProjectConfig(
+        name="celery-only",
+        project_type=ProjectType.API,
+        framework=Framework.DJANGO,
+        database=Database.SQLITE,
+        background_jobs=[FeatureName.CELERY],  # celery only, no explicit redis
+    )
+    ctx = build_context(cfg, base_dir=tmp_path)
+    DjangoFramework().scaffold(ctx)
+
+    # order_features should auto-include redis
+    resolved = order_features(ctx.features)
+    assert "redis" in resolved
+    assert resolved.index("redis") < resolved.index("celery")
+
+    # RedisFeature.install should generate contrib/redis.py
+    RedisFeature().install(ctx)
+    redis_py = ctx.project_dir / "contrib" / "redis.py"
+    assert redis_py.exists()
+
+
+def test_auth_only_auto_includes_jwt(tmp_path):
+    """Selecting only auth should auto-include jwt and generate jwt.py."""
+    from okepy.core.registry import order_features
+    from okepy.features import JWTFeature
+
+    cfg = ProjectConfig(
+        name="auth-only",
+        project_type=ProjectType.API,
+        framework=Framework.DJANGO,
+        database=Database.SQLITE,
+        auth_providers=[AuthProvider.EMAIL_PASSWORD],  # implies auth feature
+    )
+    ctx = build_context(cfg, base_dir=tmp_path)
+    DjangoFramework().scaffold(ctx)
+
+    resolved = order_features(ctx.features)
+    assert "jwt" in resolved
+    assert resolved.index("jwt") < resolved.index("auth")
+
+    JWTFeature().install(ctx)
+    jwt_py = ctx.project_dir / "jwt.py"
+    assert jwt_py.exists()
+
+
+def test_social_auto_includes_auth_and_jwt_transitive(tmp_path):
+    """Social should auto-include auth and jwt (transitive via auth)."""
+    from okepy.core.registry import order_features
+    from okepy.features import AuthFeature, JWTFeature
+
+    cfg = ProjectConfig(
+        name="social-only",
+        project_type=ProjectType.API,
+        framework=Framework.DJANGO,
+        database=Database.SQLITE,
+        auth_providers=[AuthProvider.GOOGLE],  # social implied, auth not explicit
+    )
+    ctx = build_context(cfg, base_dir=tmp_path)
+    DjangoFramework().scaffold(ctx)
+    # Note: auth is implied by selected_features because auth_providers is
+    # non-empty, but social is also implied by Google provider.  The key is
+    # that jwt gets auto-included even though it's not in the wizard checkboxes.
+
+    resolved = order_features(ctx.features)
+    assert "jwt" in resolved
+    assert "auth" in resolved
+    assert "social" in resolved
+    assert resolved.index("jwt") < resolved.index("auth") < resolved.index("social")
