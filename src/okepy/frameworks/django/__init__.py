@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from textwrap import dedent
 
 from okepy.core.config import ProjectType
 from okepy.core.context import ProjectContext
@@ -25,6 +26,7 @@ class DjangoFramework(Framework):
             "api_auth": bool(cfg.api_auth),
             "auth_enabled": context.feature_enabled("auth"),
             "background_jobs": bool(cfg.background_jobs),
+            "base_deps": self.base_dependencies(context),
         }
 
         _mkdir(project_dir / "apps" / "api")
@@ -116,8 +118,8 @@ class DjangoFramework(Framework):
     def wire(self, context: ProjectContext) -> None:
         if context.feature_enabled("auth"):
             self._wire_auth(context)
-        if context.feature_enabled("postgres"):
-            self._wire_postgres(context)
+        if context.config.database.value in ("postgresql", "mysql"):
+            self._wire_database_url(context)
         if context.feature_enabled("redis"):
             self._wire_redis(context)
         if context.feature_enabled("celery"):
@@ -191,7 +193,7 @@ FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
                 urls_path.write_text(content, encoding="utf-8")
 
     @staticmethod
-    def _wire_postgres(context: ProjectContext) -> None:
+    def _wire_database_url(context: ProjectContext) -> None:
         project_dir = context.project_dir
         settings_path = project_dir / "config" / "settings" / "base.py"
         if not settings_path.exists():
@@ -199,27 +201,34 @@ FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
         content = settings_path.read_text(encoding="utf-8")
         if "DATABASE_URL" in content:
             return
-        pg_block = """
-# PostgreSQL (from DATABASE_URL)
-import os
-from urllib.parse import urlparse
+        db = context.config.database.value
+        engine = {
+            "postgresql": "django.db.backends.postgresql",
+            "mysql": "django.db.backends.mysql",
+        }.get(db)
+        if engine is None:
+            return
+        label = db.title()
+        url_block = dedent(f"""\
+        # {label} (from DATABASE_URL)
+        import os
+        from urllib.parse import urlparse
 
-_db_url = os.getenv("DATABASE_URL", "")
-if _db_url:
-    _parsed = urlparse(_db_url)
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": _parsed.path[1:],
-            "USER": _parsed.username,
-            "PASSWORD": _parsed.password,
-            "HOST": _parsed.hostname,
-            "PORT": _parsed.port or 5432,
-        }
-    }
-"""
-        if "DATABASES" in content:
-            content += pg_block
+        _db_url = os.getenv("DATABASE_URL", "")
+        if _db_url:
+            _parsed = urlparse(_db_url)
+            DATABASES = {{
+                "default": {{
+                    "ENGINE": "{engine}",
+                    "NAME": _parsed.path[1:],
+                    "USER": _parsed.username,
+                    "PASSWORD": _parsed.password,
+                    "HOST": _parsed.hostname,
+                    "PORT": _parsed.port or 5432,
+                }}
+            }}
+        """)
+        content += url_block
         settings_path.write_text(content, encoding="utf-8")
 
     @staticmethod
@@ -392,6 +401,9 @@ CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET", default="")
                 deps.append("psycopg2-binary>=2.9")
             elif db == "mysql":
                 deps.append("mysqlclient>=2.2")
+            pt = context.config.project_type
+            if pt in (ProjectType.SSR, ProjectType.HYBRID):
+                deps.append("django-template-partials>=24.4")
         return deps
 
     @staticmethod

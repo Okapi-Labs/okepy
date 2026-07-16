@@ -193,7 +193,7 @@ def test_celery_only_auto_includes_redis_files(tmp_path):
 
 
 def test_auth_only_auto_includes_jwt(tmp_path):
-    """Selecting only auth should auto-include jwt and generate jwt.py."""
+    """Selecting only auth should auto-include jwt and generate tokens.py."""
     from okepy.core.registry import order_features
 
     cfg = ProjectConfig(
@@ -211,8 +211,8 @@ def test_auth_only_auto_includes_jwt(tmp_path):
     assert resolved.index("jwt") < resolved.index("auth")
 
     JWTFeature().install(ctx)
-    jwt_py = ctx.project_dir / "jwt.py"
-    assert jwt_py.exists()
+    tokens_py = ctx.project_dir / "tokens.py"
+    assert tokens_py.exists()
 
 
 def test_social_auto_includes_auth_and_jwt_transitive(tmp_path):

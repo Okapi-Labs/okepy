@@ -38,41 +38,59 @@ def _choices(enum_cls, labels=None):
     return out
 
 
-def run_wizard() -> ProjectConfig:
-    """Run the full interactive prompt sequence and return a ProjectConfig."""
-    name = questionary.text(
-        "Project name?",
-        default="my-api",
-        validate=lambda t: len(t.strip()) > 0 or "Please enter a project name.",
-        style=_PROMPT_STYLE,
-    ).ask()
+def run_wizard(
+    name: str | None = None,
+    project_type: str | None = None,
+    framework: str | None = None,
+    database: str | None = None,
+    deployment: str | None = None,
+) -> ProjectConfig:
+    """Run the interactive prompt sequence, skipping any question already answered via *keyword arguments*."""
+    if name is None:
+        name = questionary.text(
+            "Project name?",
+            default="my-api",
+            validate=lambda t: len(t.strip()) > 0 or "Please enter a project name.",
+            style=_PROMPT_STYLE,
+        ).ask()
 
-    project_type = questionary.select(
-        "Project type?",
-        choices=_choices(
-            ProjectType,
-            {ProjectType.API: "API", ProjectType.SSR: "SSR", ProjectType.HYBRID: "Hybrid"},
-        ),
-        style=_PROMPT_STYLE,
-    ).ask()
+    if project_type is None:
+        project_type = questionary.select(
+            "Project type?",
+            choices=_choices(
+                ProjectType,
+                {ProjectType.API: "API", ProjectType.SSR: "SSR", ProjectType.HYBRID: "Hybrid"},
+            ),
+            style=_PROMPT_STYLE,
+        ).ask()
 
-    framework = questionary.select(
-        "Framework?",
-        choices=_choices(
-            Framework,
-            {Framework.DJANGO: "Django", Framework.FASTAPI: "FastAPI", Framework.FLASK: "Flask"},
-        ),
-        style=_PROMPT_STYLE,
-    ).ask()
+    if framework is None:
+        framework = questionary.select(
+            "Framework?",
+            choices=_choices(
+                Framework,
+                {
+                    Framework.DJANGO: "Django",
+                    Framework.FASTAPI: "FastAPI",
+                    Framework.FLASK: "Flask",
+                },
+            ),
+            style=_PROMPT_STYLE,
+        ).ask()
 
-    database = questionary.select(
-        "Database?",
-        choices=_choices(
-            Database,
-            {Database.POSTGRESQL: "PostgreSQL", Database.MYSQL: "MySQL", Database.SQLITE: "SQLite"},
-        ),
-        style=_PROMPT_STYLE,
-    ).ask()
+    if database is None:
+        database = questionary.select(
+            "Database?",
+            choices=_choices(
+                Database,
+                {
+                    Database.POSTGRESQL: "PostgreSQL",
+                    Database.MYSQL: "MySQL",
+                    Database.SQLITE: "SQLite",
+                },
+            ),
+            style=_PROMPT_STYLE,
+        ).ask()
 
     auth_providers: list[str] = (
         questionary.checkbox(
@@ -158,19 +176,20 @@ def run_wizard() -> ProjectConfig:
         or []
     )
 
-    deployment = questionary.select(
-        "Deployment?",
-        choices=_choices(
-            Deployment,
-            {
-                Deployment.RENDER: "Render",
-                Deployment.RAILWAY: "Railway",
-                Deployment.FLY: "Fly.io",
-                Deployment.NONE: "None",
-            },
-        ),
-        style=_PROMPT_STYLE,
-    ).ask()
+    if deployment is None:
+        deployment = questionary.select(
+            "Deployment?",
+            choices=_choices(
+                Deployment,
+                {
+                    Deployment.RENDER: "Render",
+                    Deployment.RAILWAY: "Railway",
+                    Deployment.FLY: "Fly.io",
+                    Deployment.NONE: "None",
+                },
+            ),
+            style=_PROMPT_STYLE,
+        ).ask()
 
     storage_features = _normalize_storage(storage)
 

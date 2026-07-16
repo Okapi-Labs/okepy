@@ -42,9 +42,11 @@ def create(
     ),
     dry_run: bool = typer.Option(False, "--dry-run", help="Plan only; do not write files."),
     force: bool = typer.Option(False, "--force", help="Allow writing into a non-empty directory."),
-    target: Path = typer.Option(Path.cwd(), "--target", help="Base directory for the new project."),
+    target: Path = typer.Option(None, "--target", help="Base directory for the new project."),
 ) -> None:
     """Scaffold a new production-ready Python backend project."""
+    target = target or Path.cwd()
+
     banner()
     _bootstrap_plugins()
 
@@ -97,13 +99,22 @@ def _resolve_config(
         base.deployment = DepEnum(deployment)
         return base
 
-    if name:
-        cfg = run_wizard()
-        cfg.name = name
-        cfg.framework = framework
-        return cfg
+    wizard_kwargs = {}
+    if name is not None:
+        wizard_kwargs["name"] = name
+    if framework != Framework.FASTAPI:
+        wizard_kwargs["framework"] = framework.value
+    if project_type != "api":
+        wizard_kwargs["project_type"] = project_type
+    if database != "postgresql":
+        wizard_kwargs["database"] = database
+    if deployment != "none":
+        wizard_kwargs["deployment"] = deployment
 
-    return run_wizard()
+    cfg = run_wizard(**wizard_kwargs) if wizard_kwargs else run_wizard()
+    if name is not None:
+        cfg.name = name
+    return cfg
 
 
 def _print_summary(context) -> None:

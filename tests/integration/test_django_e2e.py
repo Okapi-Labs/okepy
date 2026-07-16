@@ -183,7 +183,7 @@ class TestDependencyResolution:
             auth_providers=[AuthProvider.EMAIL_PASSWORD],
             api_auth=[FeatureName.JWT],
         )
-        assert (ctx.project_dir / "jwt.py").exists()
+        assert (ctx.project_dir / "tokens.py").exists()
 
     def test_bare_minimum_produces_no_crash(self, generate_django_project):
         """A project with minimal settings must not crash during generation."""

@@ -1,8 +1,8 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from tokens import create_tokens
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 from .models import User
 from .emails import send_verification_email
@@ -33,10 +33,10 @@ class LoginView(APIView):
                 {"detail": "Invalid credentials"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
-        refresh = RefreshToken.for_user(user)
+        tokens = create_tokens(user)
         return Response({
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
+            "access": tokens["access"],
+            "refresh": tokens["refresh"],
             "user": UserSerializer(user).data,
         })
 
