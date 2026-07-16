@@ -15,12 +15,11 @@ class AuthFeature(Feature):
     dependencies = frozenset({"jwt"})  # type: ignore[assignment]
 
     def install(self, context: ProjectContext) -> None:
-        package = context.package_name
         project_dir = context.project_dir
-        users_dir = project_dir / package / "users"
+        users_dir = project_dir / "users"
         users_dir.mkdir(parents=True, exist_ok=True)
 
-        ctx = {"package_name": package}
+        ctx = {"package_name": context.package_name}
 
         files = {
             "__init__.py": "__init__.py.jinja",
