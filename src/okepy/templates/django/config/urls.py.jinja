@@ -4,9 +4,9 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
 {% if project_type in ('api', 'hybrid') %}
-    path("api/", include("{{ package_name }}.apps.api.urls")),
+    path("api/", include("apps.api.urls")),
 {% endif -%}
 {%- if project_type in ('ssr', 'hybrid') %}
-    path("", include("{{ package_name }}.apps.web.urls")),
+    path("", include("apps.web.urls")),
 {%- endif %}
 ]
