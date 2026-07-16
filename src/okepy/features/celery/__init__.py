@@ -12,14 +12,13 @@ class CeleryFeature(Feature):
 
     def install(self, context: ProjectContext) -> None:
         project_dir = context.project_dir
-        package = context.package_name
-        ctx = {"package_name": package}
+        ctx = {"package_name": context.package_name}
 
         content = render_template("celery.py.jinja", ctx)
-        (project_dir / package / "config" / "celery.py").write_text(content, encoding="utf-8")
+        (project_dir / "config" / "celery.py").write_text(content, encoding="utf-8")
 
         content = render_template("tasks.py.jinja", ctx)
-        (project_dir / package / "tasks.py").write_text(content, encoding="utf-8")
+        (project_dir / "tasks.py").write_text(content, encoding="utf-8")
 
     def base_dependencies(self, context: ProjectContext | None = None) -> list[str]:
         return ["celery>=5.4"]

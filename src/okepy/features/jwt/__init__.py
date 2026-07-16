@@ -10,11 +10,10 @@ class JWTFeature(Feature):
     label = "JWT Auth"
 
     def install(self, context: ProjectContext) -> None:
-        package = context.package_name
         project_dir = context.project_dir
-        ctx = {"package_name": package}
+        ctx = {"package_name": context.package_name}
         content = render_template("jwt.py.jinja", ctx)
-        (project_dir / package / "jwt.py").write_text(content, encoding="utf-8")
+        (project_dir / "jwt.py").write_text(content, encoding="utf-8")
 
     def required_env(self) -> list[str]:
         return [
