@@ -110,31 +110,30 @@ class DjangoFramework(Framework):
                 "django/apps/api/admin.py.jinja", project_dir / "apps" / "api" / "admin.py", ctx
             )
 
-        if cfg.project_type in (ProjectType.SSR, ProjectType.HYBRID):
-            self._render(
-                "django/apps/web/__init__.py.jinja",
-                project_dir / "apps" / "web" / "__init__.py",
-                ctx,
-            )
-            self._render(
-                "django/apps/web/apps.py.jinja", project_dir / "apps" / "web" / "apps.py", ctx
-            )
-            self._render(
-                "django/apps/web/views.py.jinja", project_dir / "apps" / "web" / "views.py", ctx
-            )
-            self._render(
-                "django/apps/web/urls.py.jinja", project_dir / "apps" / "web" / "urls.py", ctx
-            )
-            write_text(
-                project_dir / "apps" / "web" / "templates" / "web" / "home.html",
-                render_template("django/apps/web/templates/web/home.html", ctx),
-                overwrite=True,
-            )
-            write_text(
-                project_dir / "apps" / "web" / "static" / "web" / "css" / "style.css",
-                render_template("django/apps/web/static/web/css/style.css", ctx),
-                overwrite=True,
-            )
+        self._render(
+            "django/apps/web/__init__.py.jinja",
+            project_dir / "apps" / "web" / "__init__.py",
+            ctx,
+        )
+        self._render(
+            "django/apps/web/apps.py.jinja", project_dir / "apps" / "web" / "apps.py", ctx
+        )
+        self._render(
+            "django/apps/web/views.py.jinja", project_dir / "apps" / "web" / "views.py", ctx
+        )
+        self._render(
+            "django/apps/web/urls.py.jinja", project_dir / "apps" / "web" / "urls.py", ctx
+        )
+        write_text(
+            project_dir / "apps" / "web" / "templates" / "web" / "home.html",
+            render_template("django/apps/web/templates/web/home.html", ctx),
+            overwrite=True,
+        )
+        write_text(
+            project_dir / "apps" / "web" / "static" / "web" / "css" / "style.css",
+            render_template("django/apps/web/static/web/css/style.css", ctx),
+            overwrite=True,
+        )
 
     def wire(self, context: ProjectContext) -> None:
         if context.feature_enabled("auth"):
@@ -204,13 +203,16 @@ FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
 
             settings_path.write_text(content, encoding="utf-8")
 
+        is_api = context.config.project_type in (ProjectType.API, ProjectType.HYBRID)
+        auth_prefix = "api/auth/" if is_api else "auth/"
         urls_path = project_dir / "config" / "urls.py"
         if urls_path.exists():
             content = urls_path.read_text(encoding="utf-8")
-            if "path('auth/'" not in content:
-                marker = "urlpatterns = ["
-                insert = "    path('auth/', include('users.urls')),\n"
-                content = content.replace(marker, marker + "\n" + insert)
+            marker = f"path('{auth_prefix}'"
+            if marker not in content:
+                insert_marker = "urlpatterns = ["
+                insert = f"    path('{auth_prefix}', include('users.urls')),\n"
+                content = content.replace(insert_marker, insert_marker + "\n" + insert)
                 urls_path.write_text(content, encoding="utf-8")
 
     @staticmethod
@@ -312,6 +314,7 @@ CELERY_TIMEZONE = "UTC"
     @staticmethod
     def _wire_social(context: ProjectContext) -> None:
         project_dir = context.project_dir
+        providers = {p.value for p in context.config.auth_providers}
 
         settings_path = project_dir / "config" / "settings" / "base.py"
         if settings_path.exists():
@@ -328,33 +331,37 @@ CELERY_TIMEZONE = "UTC"
                 content = content.replace(marker, marker + "\n" + insert)
 
             if "AUTHENTICATION_BACKENDS" not in content:
-                backends_block = """
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "social_core.backends.google.GoogleOAuth2",
-    "social_core.backends.github.GithubOAuth2",
-]
-"""
+                backend_entries = []
+                backend_entries.append('    "django.contrib.auth.backends.ModelBackend",')
+                if "google" in providers:
+                    backend_entries.append('    "social_core.backends.google.GoogleOAuth2",')
+                if "github" in providers:
+                    backend_entries.append('    "social_core.backends.github.GithubOAuth2",')
+                backends_block = "\nAUTHENTICATION_BACKENDS = [\n" + "\n".join(backend_entries) + "\n]\n"
                 content += backends_block
 
-            social_cfg = """
-# Social auth
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("GOOGLE_CLIENT_ID", default="")
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("GOOGLE_CLIENT_SECRET", default="")
-SOCIAL_AUTH_GITHUB_KEY = config("GITHUB_CLIENT_ID", default="")
-SOCIAL_AUTH_GITHUB_SECRET = config("GITHUB_CLIENT_SECRET", default="")
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
-SOCIAL_AUTH_USER_MODEL = "users.User"
-"""
-            if "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY" not in content:
+            social_cfg_lines = ["", "# Social auth"]
+            if "google" in providers:
+                social_cfg_lines.append('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("GOOGLE_CLIENT_ID", default="")')
+                social_cfg_lines.append('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("GOOGLE_CLIENT_SECRET", default="")')
+            if "github" in providers:
+                social_cfg_lines.append('SOCIAL_AUTH_GITHUB_KEY = config("GITHUB_CLIENT_ID", default="")')
+                social_cfg_lines.append('SOCIAL_AUTH_GITHUB_SECRET = config("GITHUB_CLIENT_SECRET", default="")')
+            social_cfg_lines.append('SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"')
+            social_cfg_lines.append('SOCIAL_AUTH_USER_MODEL = "users.User"')
+            social_cfg = "\n".join(social_cfg_lines)
+
+            if "SOCIAL_AUTH_LOGIN_REDIRECT_URL" not in content:
                 content += social_cfg
 
             settings_path.write_text(content, encoding="utf-8")
 
+        is_api = context.config.project_type in (ProjectType.API, ProjectType.HYBRID)
+        social_prefix = f"api/auth/social/" if is_api else "auth/social/"
         urls_path = project_dir / "config" / "urls.py"
         if urls_path.exists():
             content = urls_path.read_text(encoding="utf-8")
-            auth_social = "path('auth/social/', include('social_auth.urls')),"
+            auth_social = f"path('{social_prefix}', include('social_auth.urls')),"
             if auth_social not in content:
                 marker = "urlpatterns = ["
                 insert = f"    {auth_social}\n"
