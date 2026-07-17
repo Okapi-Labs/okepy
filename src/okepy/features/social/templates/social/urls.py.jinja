@@ -3,10 +3,18 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+{% if "google" in auth_providers %}
     path("google/", views.GoogleLoginView.as_view(), name="google-login"),
+{% endif %}
+{% if "github" in auth_providers %}
     path("github/", views.GitHubLoginView.as_view(), name="github-login"),
+{% endif %}
+{% if "magic_link" in auth_providers %}
     path("magic-link/request/", views.MagicLinkRequestView.as_view(), name="magic-link-request"),
     path("magic-link/verify/", views.MagicLinkVerifyView.as_view(), name="magic-link-verify"),
+{% endif %}
+{% if "otp" in auth_providers %}
     path("otp/request/", views.OTPRequestView.as_view(), name="otp-request"),
     path("otp/verify/", views.OTPVerifyView.as_view(), name="otp-verify"),
+{% endif %}
 ]

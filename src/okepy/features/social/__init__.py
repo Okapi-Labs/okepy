@@ -15,7 +15,10 @@ class SocialFeature(Feature):
         app_dir = project_dir / "social_auth"
         app_dir.mkdir(parents=True, exist_ok=True)
 
-        ctx = {"package_name": context.package_name}
+        ctx = {
+            "package_name": context.package_name,
+            "auth_providers": [p.value for p in context.config.auth_providers],
+        }
 
         files = {
             "__init__.py": "social/__init__.py.jinja",
