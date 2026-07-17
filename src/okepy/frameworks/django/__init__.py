@@ -6,7 +6,7 @@ from textwrap import dedent
 from okepy.core.config import ProjectType
 from okepy.core.context import ProjectContext
 from okepy.core.framework import Framework
-from okepy.utils.files import write_text
+from okepy.utils.files import copy_file, write_text
 from okepy.utils.templating import render_template
 
 
@@ -140,7 +140,7 @@ class DjangoFramework(Framework):
             render_template("django/apps/web/static/web/img/okepy-logo.png", ctx),
             overwrite=True,
         )
-        fw_logo = f"{cfg.framework.value}-logo.svg"
+        fw_logo = f"{cfg.framework.value}-logo.png"
         write_text(
             project_dir / "apps" / "web" / "static" / "web" / "img" / fw_logo,
             render_template(f"django/apps/web/static/web/img/{fw_logo}", ctx),
