@@ -54,6 +54,7 @@ class DjangoFramework(Framework):
         _mkdir(project_dir / "apps" / "web")
         _mkdir(project_dir / "apps" / "web" / "templates" / "web")
         _mkdir(project_dir / "apps" / "web" / "static" / "web" / "css")
+        _mkdir(project_dir / "apps" / "web" / "static" / "web" / "img")
         _mkdir(project_dir / "staticfiles")
         _mkdir(project_dir / "media")
 
@@ -132,6 +133,11 @@ class DjangoFramework(Framework):
         write_text(
             project_dir / "apps" / "web" / "static" / "web" / "css" / "style.css",
             render_template("django/apps/web/static/web/css/style.css", ctx),
+            overwrite=True,
+        )
+        write_text(
+            project_dir / "apps" / "web" / "static" / "web" / "img" / "okepy-logo.svg",
+            render_template("django/apps/web/static/web/img/okepy-logo.svg", ctx),
             overwrite=True,
         )
 
