@@ -19,6 +19,15 @@ def write_text(path: Path, content: str, *, overwrite: bool = False) -> Path:
     return path
 
 
+def copy_file(src: Path, dst: Path, *, overwrite: bool = False) -> Path:
+    """Copy a file from *src* to *dst*, refusing to clobber unless ``overwrite``."""
+    if dst.exists() and not overwrite:
+        raise FileExistsError(f"Refusing to overwrite existing file: {dst}")
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.write_bytes(src.read_bytes())
+    return dst
+
+
 def render_to_file(template_text: str, target: Path, context: dict) -> Path:
     """Render a Jinja2 template string and write it to ``target``.
 
