@@ -81,7 +81,7 @@ class ProjectConfig(BaseModel):
 
     name: str = Field(..., description="Project name (will be slugified for the directory).")
     project_type: ProjectType = ProjectType.API
-    framework: Framework = Framework.FASTAPI
+    framework: Framework = Framework.DJANGO
     database: Database = Database.POSTGRESQL
     auth_providers: list[AuthProvider] = Field(default_factory=list)
     api_auth: list[FeatureName] = Field(default_factory=list)
@@ -145,7 +145,7 @@ def default_config(name: str = "my-api") -> ProjectConfig:
     return ProjectConfig(
         name=name,
         project_type=ProjectType.API,
-        framework=Framework.FASTAPI,
+        framework=Framework.DJANGO,
         database=Database.POSTGRESQL,
         auth_providers=[AuthProvider.EMAIL_PASSWORD],
         api_auth=[FeatureName.JWT, FeatureName.REFRESH],

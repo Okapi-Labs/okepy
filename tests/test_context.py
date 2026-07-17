@@ -27,4 +27,4 @@ def test_features_passthrough():
 
 def test_framework_name_roundtrip():
     ctx = build_context(default_config("x"))
-    assert ctx.config.framework == Framework.FASTAPI
+    assert ctx.config.framework == Framework.DJANGO
