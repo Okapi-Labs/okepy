@@ -140,6 +140,12 @@ class DjangoFramework(Framework):
             render_template("django/apps/web/static/web/img/okepy-logo.svg", ctx),
             overwrite=True,
         )
+        fw_logo = f"{cfg.framework.value}-logo.svg"
+        write_text(
+            project_dir / "apps" / "web" / "static" / "web" / "img" / fw_logo,
+            render_template(f"django/apps/web/static/web/img/{fw_logo}", ctx),
+            overwrite=True,
+        )
 
     def wire(self, context: ProjectContext) -> None:
         if context.feature_enabled("auth"):

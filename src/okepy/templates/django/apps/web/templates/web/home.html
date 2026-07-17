@@ -41,7 +41,9 @@
                     {% raw %}<img src="{% static 'web/img/okepy-logo.svg' %}" alt="okepy" class="logo-img">{% endraw %}
                 </div>
                 <div class="logo-cross">&#x2715;</div>
-                <div class="logo-framework">{{ framework_label | lower }}</div>
+                <div>
+                    {% raw %}<img src="{% static 'web/img/{% endraw %}{{ framework }}{% raw %}-logo.svg' %}" alt="{{ framework_label }}" class="logo-img">{% endraw %}
+                </div>
             </div>
 
             <!-- Hero title -->
