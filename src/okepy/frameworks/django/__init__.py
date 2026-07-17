@@ -18,13 +18,34 @@ class DjangoFramework(Framework):
         project_dir = context.project_dir
         cfg = context.config
 
+        _labels = {
+            "postgresql": "PostgreSQL",
+            "mysql": "MySQL",
+            "sqlite": "SQLite",
+        }
+        _fw_labels = {
+            "django": "Django",
+            "fastapi": "FastAPI",
+            "flask": "Flask",
+        }
+        _fw_docs = {
+            "django": "https://docs.djangoproject.com/",
+            "fastapi": "https://fastapi.tiangolo.com/",
+            "flask": "https://flask.palletsprojects.com/",
+        }
+        fw = cfg.framework.value
         ctx = {
             "package_name": context.package_name,
             "project_name": context.name,
             "project_type": cfg.project_type.value,
             "database": cfg.database.value,
-            "api_auth": bool(cfg.api_auth),
+            "database_label": _labels.get(cfg.database.value, cfg.database.value),
+            "framework": fw,
+            "framework_label": _fw_labels.get(fw, fw.title()),
+            "framework_docs_url": _fw_docs.get(fw, "#"),
             "auth_enabled": context.feature_enabled("auth"),
+            "auth_label": "JWT" if context.feature_enabled("auth") else "None",
+            "api_auth": bool(cfg.api_auth),
             "background_jobs": bool(cfg.background_jobs),
             "base_deps": self.base_dependencies(context),
         }
