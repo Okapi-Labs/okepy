@@ -136,7 +136,7 @@ class DjangoFramework(Framework):
             overwrite=True,
         )
         write_text(
-            project_dir / "apps" / "web" / "static" / "web" / "img" / "okepy-logo.svg",
+            project_dir / "apps" / "web" / "static" / "web" / "img" / "okepy-logo.png",
             render_template("django/apps/web/static/web/img/okepy-logo.svg", ctx),
             overwrite=True,
         )
