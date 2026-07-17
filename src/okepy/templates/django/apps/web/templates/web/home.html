@@ -196,7 +196,7 @@
                 <span id="env-text" class="env-text">You are in development mode.</span>
                 <div class="env-info-tooltip">
                     <i class="fa-regular fa-circle-info"></i>
-                    <span class="env-tooltip-text">Toggle by setting DEBUG=True or DEBUG=False in .env</span>
+                    <span id="env-tooltip-text" class="env-tooltip-text">Set DEBUG=False in .env to switch to production</span>
                 </div>
             </div>
         </div>
@@ -230,13 +230,16 @@
         function toggleEnvironment() {
             var dot = document.getElementById('env-dot');
             var label = document.getElementById('env-text');
+            var tooltip = document.getElementById('env-tooltip-text');
 
             if (dot.classList.contains('dev')) {
                 dot.className = 'env-dot prod';
                 label.textContent = 'You are in production mode.';
+                tooltip.textContent = 'Set DEBUG=True in .env to switch to development';
             } else {
                 dot.className = 'env-dot dev';
                 label.textContent = 'You are in development mode.';
+                tooltip.textContent = 'Set DEBUG=False in .env to switch to production';
             }
         }
 
