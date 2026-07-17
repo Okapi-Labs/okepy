@@ -29,7 +29,7 @@ _create = typer.Typer(help="Create a new Python backend project.")
 def create(
     name: str | None = typer.Option(None, "--name", "-n", help="Project name."),
     framework: Framework = typer.Option(
-        Framework.FASTAPI, "--framework", "-f", help="Target framework."
+        Framework.DJANGO, "--framework", "-f", help="Target framework."
     ),
     project_type: str = typer.Option("api", "--type", help="api | ssr | hybrid."),
     database: str = typer.Option("postgresql", "--db", help="postgresql | mysql | sqlite."),
@@ -102,7 +102,7 @@ def _resolve_config(
     wizard_kwargs = {}
     if name is not None:
         wizard_kwargs["name"] = name
-    if framework != Framework.FASTAPI:
+    if framework != Framework.DJANGO:
         wizard_kwargs["framework"] = framework.value
     if project_type != "api":
         wizard_kwargs["project_type"] = project_type
