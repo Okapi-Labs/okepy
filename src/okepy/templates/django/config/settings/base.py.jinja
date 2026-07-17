@@ -20,9 +20,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "apps.api",
 {% endif -%}
-{%- if project_type in ('ssr', 'hybrid') %}
     "apps.web",
-{%- endif %}
 ]
 
 MIDDLEWARE = [
