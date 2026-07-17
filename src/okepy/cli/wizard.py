@@ -67,14 +67,11 @@ def run_wizard(
     if framework is None:
         framework = questionary.select(
             "Framework?",
-            choices=_choices(
-                Framework,
-                {
-                    Framework.DJANGO: "Django",
-                    Framework.FASTAPI: "FastAPI",
-                    Framework.FLASK: "Flask",
-                },
-            ),
+            choices=[
+                questionary.Choice(title="Django", value="django"),
+                questionary.Choice(title="FastAPI (Coming soon)", value="fastapi", disabled="Coming soon"),
+                questionary.Choice(title="Flask (Coming soon)", value="flask", disabled="Coming soon"),
+            ],
             style=_PROMPT_STYLE,
         ).ask()
 
