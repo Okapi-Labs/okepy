@@ -19,7 +19,11 @@ class AuthFeature(Feature):
         users_dir = project_dir / "users"
         users_dir.mkdir(parents=True, exist_ok=True)
 
-        ctx = {"package_name": context.package_name}
+        ctx = {
+            "package_name": context.package_name,
+            "auth_providers": [p.value for p in context.config.auth_providers],
+            "api_auth": [f.value for f in context.config.api_auth],
+        }
 
         files = {
             "__init__.py": "__init__.py.jinja",
