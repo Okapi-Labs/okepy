@@ -141,9 +141,9 @@ class DjangoFramework(Framework):
             overwrite=True,
         )
         fw_logo = f"{cfg.framework.value}-logo.png"
-        write_text(
+        copy_file(
+            Path(__file__).resolve().parent.parent.parent / "templates" / "django" / "apps" / "web" / "static" / "web" / "img" / fw_logo,
             project_dir / "apps" / "web" / "static" / "web" / "img" / fw_logo,
-            render_template(f"django/apps/web/static/web/img/{fw_logo}", ctx),
             overwrite=True,
         )
 
