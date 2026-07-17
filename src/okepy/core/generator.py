@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+
 from okepy.core.context import ProjectContext
 from okepy.core.framework import Framework
 from okepy.core.registry import get_framework, order_features
@@ -106,13 +108,15 @@ class Generator:
         framework.wire(self.context)
 
     def env(self) -> None:
-        step("Generating .env.example")
+        step("Generating .env.example and .env")
         if not self.dry_run:
-            env_path = self.context.project_dir / ".env.example"
-            env_path.parent.mkdir(parents=True, exist_ok=True)
-            env_path.write_text(
-                _default_env(self.context, self._resolved_features(self._framework()))
-            )
+            content = _default_env(self.context, self._resolved_features(self._framework()))
+            env_example = self.context.project_dir / ".env.example"
+            env_example.parent.mkdir(parents=True, exist_ok=True)
+            env_example.write_text(content)
+            env_file = self.context.project_dir / ".env"
+            if not env_file.exists():
+                env_file.write_text(content)
 
     def finalize(self) -> None:
         project_dir = self.context.project_dir
@@ -122,13 +126,17 @@ class Generator:
         step("Finalizing")
         success(f"Project '{name}' created at {project_dir}")
         print()
+
+        python = _detect_python()
+        is_win = sys.platform == "win32"
+        venv_activate = ".venv\\Scripts\\activate" if is_win else "source .venv/bin/activate"
+
         print("  Next steps:")
         print()
         print(f"    cd {project_dir}")
-        print("    source .venv/bin/activate")
-        print("    cp .env.example .env")
-        print("    python manage.py migrate")
-        print("    python manage.py runserver")
+        print(f"    {venv_activate}")
+        print(f"    {python} manage.py migrate")
+        print(f"    {python} manage.py runserver")
         print()
         if cfg.database.value == "postgresql":
             print("  PostgreSQL:")
@@ -147,6 +155,10 @@ class Generator:
         from okepy.utils.shell import has_uv
 
         return "uv" if has_uv() else "venv"
+
+
+def _detect_python() -> str:
+    return "python3" if sys.platform == "linux" else "python"
 
 
 def _default_env(context: ProjectContext, resolved_features: list[str] | None = None) -> str:
