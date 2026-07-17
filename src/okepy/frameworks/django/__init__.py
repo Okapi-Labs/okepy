@@ -135,9 +135,9 @@ class DjangoFramework(Framework):
             render_template("django/apps/web/static/web/css/style.css", ctx),
             overwrite=True,
         )
-        write_text(
+        copy_file(
+            Path(__file__).resolve().parent.parent.parent / "templates" / "django" / "apps" / "web" / "static" / "web" / "img" / "okepy-logo.png",
             project_dir / "apps" / "web" / "static" / "web" / "img" / "okepy-logo.png",
-            render_template("django/apps/web/static/web/img/okepy-logo.png", ctx),
             overwrite=True,
         )
         fw_logo = f"{cfg.framework.value}-logo.png"
