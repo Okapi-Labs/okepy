@@ -53,10 +53,21 @@ Available flags:
 
 ```bash
 cd myapi
-source .venv/bin/activate
 cp .env.example .env
 python manage.py migrate
 python manage.py runserver
+```
+
+macOS / Linux — activate the virtual environment first:
+
+```bash
+source .venv/bin/activate
+```
+
+Windows — activate the virtual environment first:
+
+```powershell
+.venv\Scripts\activate
 ```
 
 Your API is live at `http://localhost:8000`.
