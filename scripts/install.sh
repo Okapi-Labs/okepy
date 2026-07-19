@@ -43,18 +43,18 @@ latest_version() {
   local body
   # 1) GitHub releases/latest
   if body="$(curl -fsSL "${API_HDR[@]}" "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null)"; then
-    python3 -c 'import json,sys; d=json.loads(sys.argv[1]); print(d["tag_name"].lstrip("v"))' "$body" 2>/dev/null && return 0
+    python3 -c 'import json,sys; print(json.loads(sys.argv[1])["tag_name"])' "$body" 2>/dev/null && return 0
   fi
   # 2) PyPI JSON API
   echo "okepy: GitHub API unavailable, querying PyPI" >&2
   if body="$(curl -fsSL "${API_HDR[@]}" "https://pypi.org/pypi/okepy/json" 2>/dev/null)"; then
-    python3 -c 'import json,sys; print(json.loads(sys.argv[1])["info"]["version"])' "$body" 2>/dev/null && return 0
+    python3 -c 'import json,sys; print("v"+json.loads(sys.argv[1])["info"]["version"])' "$body" 2>/dev/null && return 0
   fi
   return 1
 }
 
-VERSION="$(latest_version)" || err "could not resolve the latest okepy version (GitHub and PyPI both unreachable)"
-TAG="v${VERSION}"
+TAG="$(latest_version)" || err "could not resolve the latest okepy version (GitHub and PyPI both unreachable)"
+VERSION="${TAG#v}"
 
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
