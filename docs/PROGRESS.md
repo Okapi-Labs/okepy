@@ -171,7 +171,7 @@
 
 ### Added
 - `scripts/bump_version.py` — bumps `pyproject.toml` patch/minor/major; defaults to patch.
-- `.github/workflows/autorelease.yml` — on every push to `main` (non-bot), bumps the patch version, commits `Bump version to X.Y.Z`, and pushes the `vX.Y.Z` tag. Guarded by `github.actor != github-actions[bot]` to avoid loops.
+- `.github/workflows/release.yml` — single push-triggered workflow (non-bot) that bumps the patch version, commits `Bump version to X.Y.Z`, tags `vX.Y.Z`, builds, publishes to PyPI, and creates the GitHub release with the wheel. One job avoids cross-workflow tag-chaining limits.
 - `.github/workflows/release.yml` — on `v*` tag push: builds the wheel, publishes to PyPI (`PYPI_API_TOKEN` secret), and creates a GitHub release with the wheel attached. Replaces the old manual `workflow.yml` (removed).
 
 ### Flow
