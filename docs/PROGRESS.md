@@ -1,6 +1,6 @@
 # okepy — Progress Tracker
 
-> Updated: Session 8 — Added cross-platform one-line GitHub install scripts
+> Updated: Session 9 — Fully automated releases (push to main → patch bump → tag → PyPI + GitHub release)
 
 ## Current Phase
 
@@ -163,5 +163,19 @@
 - Existing `workflow.yml` (PyPI publish on release) left untouched.
 - Added `scripts/install.sh` (macOS/Linux) and `scripts/install.ps1` (Windows) — one-line GitHub installers that resolve the latest release via the GitHub API, download the wheel, and `pip install` it. Fall back to the PyPI wheel when a release has no attached asset (verified against live `0.2.0`: PyPI wheel downloads and validates as a valid 64KB wheel).
 - `.github/workflows/install.yml` — CI lints/parses both install scripts on every push/PR.
-- `.github/workflows/workflow.yml` — release workflow now uploads the wheel to the GitHub release.
 - README documents `curl ... | bash` and `irm ... | iex` one-line install commands plus `OKEPY_BIN` override.
+
+---
+
+## CI / CD (2026-07-19) — Fully automated releases
+
+### Added
+- `scripts/bump_version.py` — bumps `pyproject.toml` patch/minor/major; defaults to patch.
+- `.github/workflows/autorelease.yml` — on every push to `main` (non-bot), bumps the patch version, commits `Bump version to X.Y.Z`, and pushes the `vX.Y.Z` tag. Guarded by `github.actor != github-actions[bot]` to avoid loops.
+- `.github/workflows/release.yml` — on `v*` tag push: builds the wheel, publishes to PyPI (`PYPI_API_TOKEN` secret), and creates a GitHub release with the wheel attached. Replaces the old manual `workflow.yml` (removed).
+
+### Flow
+`git push` to `main` → autorelease bumps patch + tags `vX.Y.Z` → release workflow builds, publishes to PyPI, and creates the GitHub release → install scripts (`curl … | bash` / `irm … | iex`) pick up the new version automatically. Minor/major releases are done by running `bump_version.py minor|major` before pushing.
+
+### Removed
+- `.github/workflows/workflow.yml` — superseded by `release.yml` (tag-triggered) + `autorelease.yml`.
