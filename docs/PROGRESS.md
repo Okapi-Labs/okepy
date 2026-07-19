@@ -179,3 +179,15 @@
 
 ### Removed
 - `.github/workflows/workflow.yml` — superseded by `release.yml` (tag-triggered) + `autorelease.yml`.
+
+---
+
+## Bugfix (2026-07-19) — install scripts failed to parse GitHub API
+
+### Root cause
+`install.sh` resolved the version with `echo "$body" | python3 - <<'PY'`. The heredoc redirected stdin, so Python read its own source code as JSON and crashed with "could not parse GitHub API response" — the exact error reported by the user. The error fired before any fallback could run.
+
+### Fixed
+- `scripts/install.sh` — `latest_version()` now passes the JSON body to `python3 -c` as an argument (no pipe+heredoc collision), adds a `User-Agent` header (GitHub API requires it), and falls back to the PyPI JSON API when the GitHub API is unreachable. Verified resolving `0.2.0` end-to-end against the live API.
+- `scripts/install.ps1` — mirrors the fallback: tries GitHub, then PyPI JSON API; only fails if both are unreachable (previously crashed on any GitHub error).
+- `.github/workflows/install.yml` — added a `bash-resolve` job that sources the script and asserts `latest_version` returns a semver string, so this regression is caught in CI.
