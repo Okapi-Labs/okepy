@@ -13,7 +13,15 @@
 $ErrorActionPreference = "Stop"
 
 $Repo = if ($env:OKEPY_REPO) { $env:OKEPY_REPO } else { "Okapi-Labs/okepy" }
-$InstallBin = if ($env:OKEPY_BIN) { $env:OKEPY_BIN } else { "pip" }
+# Prefer pipx (isolates the CLI, avoids PEP 668 externally-managed errors).
+# Override with $env:OKEPY_BIN = "pip" or "uv pip".
+if ($env:OKEPY_BIN) {
+    $InstallBin = $env:OKEPY_BIN
+} elseif (Get-Command pipx -ErrorAction SilentlyContinue) {
+    $InstallBin = "pipx"
+} else {
+    $InstallBin = "pip"
+}
 
 function Fail($msg) {
     Write-Error "okepy: error: $msg"
@@ -55,9 +63,9 @@ try {
     Invoke-WebRequest -Uri $AssetUrl -OutFile $wheel -Headers @{"User-Agent"="okepy-installer"} -UseBasicParsing
     Write-Host "okepy: using GitHub release asset"
 } catch {
-    Write-Host "okepy: no release asset; downloading from PyPI"
     try {
         Invoke-WebRequest -Uri $PypiUrl -OutFile $wheel -Headers @{"User-Agent"="okepy-installer"} -UseBasicParsing
+        Write-Host "okepy: using PyPI wheel"
     } catch {
         Fail "failed to download okepy $Version wheel from GitHub or PyPI"
     }
@@ -65,8 +73,12 @@ try {
 
 Write-Host "okepy: installing with $InstallBin"
 try {
-    & $InstallBin install $wheel
-    if ($LASTEXITCODE -ne 0) { Fail "installation failed; check your Python/pip environment" }
+    if ($InstallBin -eq "pipx") {
+        pipx install $wheel
+    } else {
+        & $InstallBin install $wheel
+    }
+    if ($LASTEXITCODE -ne 0) { Fail "installation failed; try pipx, or use a virtual environment" }
 } finally {
     Remove-Item -Recurse -Force $tmp.FullName -ErrorAction SilentlyContinue
 }
