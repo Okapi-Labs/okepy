@@ -24,26 +24,39 @@ need() {
 need curl
 need python3
 
-# Resolve the latest release tag via the GitHub API.
-latest_tag() {
-  curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
-    | python3 - "$REPO" <<'PY'
-import json, sys, urllib.error
-repo = sys.argv[1]
-try:
-    data = json.load(sys.stdin)
-except json.JSONDecodeError:
-    sys.exit("could not parse GitHub API response")
-if "tag_name" not in data:
-    sys.exit("no published release found for %s" % repo)
-print(data["tag_name"])
-PY
+# Resolve the latest released version. Prefer the GitHub releases API; fall
+# back to the PyPI JSON API so an API hiccup (rate limit, empty body) never
+# blocks installation. Prints the bare version (e.g. "0.2.1") and returns 0,
+# or returns 1 if BOTH sources fail.
+API_HDR=(-H "User-Agent: okepy-installer")
+latest_version() {
+  local body
+  # 1) GitHub releases/latest
+  if body="$(curl -fsSL "${API_HDR[@]}" "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null)"; then
+    python3 -c 'import json,sys; d=json.loads(sys.argv[1]); print(d["tag_name"].lstrip("v"))' "$body" 2>/dev/null && return 0
+  fi
+  # 2) PyPI JSON API
+  echo "okepy: GitHub API unavailable, querying PyPI" >&2
+  if body="$(curl -fsSL "${API_HDR[@]}" "https://pypi.org/pypi/okepy/json" 2>/dev/null)"; then
+    python3 -c 'import json,sys; print(json.loads(sys.argv[1])["info"]["version"])' "$body" 2>/dev/null && return 0
+  fi
+  return 1
 }
 
-TAG="$(latest_tag)"
-VERSION="${TAG#v}"
+VERSION="$(latest_version)" || err "could not resolve the latest okepy version (GitHub and PyPI both unreachable)"
+TAG="v${VERSION}"
 
-echo "okepy: latest release is ${TAG}"
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+wheel="${tmp}/okepy-${VERSION}-py3-none-any.whl"
+
+# Prefer the GitHub release wheel; fall back to the PyPI wheel so the
+# installer works even when a release has no attached assets.
+ASSET_URL="https://github.com/${REPO}/releases/download/${TAG}/okepy-${VERSION}-py3-none-any.whl"
+PYPI_URL="https://files.pythonhosted.org/packages/py3/o/okepy/okepy-${VERSION}-py3-none-any.whl"
+
+echo "okepy: latest version is ${TAG}"
 
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
@@ -56,11 +69,11 @@ ASSET_URL="https://github.com/${REPO}/releases/download/${TAG}/okepy-${VERSION}-
 PYPI_URL="https://files.pythonhosted.org/packages/py3/o/okepy/okepy-${VERSION}-py3-none-any.whl"
 
 echo "okepy: downloading release wheel"
-if curl -fsSL "$ASSET_URL" -o "$wheel"; then
+if curl -fsSL "${API_HDR[@]}" "$ASSET_URL" -o "$wheel"; then
   echo "okepy: using GitHub release asset"
 else
   echo "okepy: no release asset; downloading from PyPI"
-  curl -fsSL "$PYPI_URL" -o "$wheel" \
+  curl -fsSL "${API_HDR[@]}" "$PYPI_URL" -o "$wheel" \
     || err "failed to download okepy ${VERSION} wheel from GitHub or PyPI"
 fi
 
