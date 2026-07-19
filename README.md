@@ -40,6 +40,20 @@ irm https://raw.githubusercontent.com/Okapi-Labs/okepy/main/scripts/install.ps1 
 
 These scripts download the latest GitHub release wheel and install it with `pip`. If the release has no attached asset, they fall back to the PyPI wheel, so the command works regardless. They are thin wrappers around `pip install`; use `pip install okepy` or `uvx okepy` when you can reach PyPI directly. Override the install command with `OKEPY_BIN=uv pip` if desired.
 
+### Automated releases
+
+Releases are fully automatic. Every push to `main` bumps the **patch** version (0.2.0 → 0.2.1 → … → 0.3.0), tags it as `vX.Y.Z`, and that tag triggers a build that publishes to **PyPI** and creates a **GitHub release** with the wheel attached. The install commands above then pick up the new version automatically — no manual steps.
+
+To cut a **minor** or **major** release instead, set the next version before pushing:
+
+```bash
+python scripts/bump_version.py minor   # or: major
+git commit -am "Bump version to $(grep '^version' pyproject.toml | cut -d'"' -f2)"
+git push                               # autorelease tags vX.Y.Z from your commit
+```
+
+The `PYPI_API_TOKEN` repository secret must be set for the PyPI publish step.
+
 ## 2. Create a project
 
 Run the wizard:
