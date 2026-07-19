@@ -34,22 +34,23 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
 
 # Resolve the latest released version. Prefer the GitHub releases API; fall
 # back to the PyPI JSON API so an API hiccup never blocks installation.
-$Version = $null
+# Keep the raw tag (e.g. "0.2.0" or "v0.2.1") so the asset URL matches exactly.
+$Tag = $null
 try {
     $release = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -Headers @{"User-Agent"="okepy-installer"} -UseBasicParsing
-    if ($release.tag_name) { $Version = $release.tag_name -replace '^v', '' }
+    if ($release.tag_name) { $Tag = $release.tag_name }
 } catch {
     Write-Host "okepy: GitHub API unavailable, querying PyPI" -ForegroundColor Yellow
 }
-if (-not $Version) {
+if (-not $Tag) {
     try {
         $pypi = Invoke-RestMethod -Uri "https://pypi.org/pypi/okepy/json" -Headers @{"User-Agent"="okepy-installer"} -UseBasicParsing
-        $Version = $pypi.info.version
+        $Tag = "v" + $pypi.info.version
     } catch {
         Fail "could not resolve the latest okepy version (GitHub and PyPI both unreachable)"
     }
 }
-$Tag = "v$Version"
+$Version = $Tag -replace '^v', ''
 Write-Host "okepy: latest version is $Tag"
 
 $AssetUrl = "https://github.com/$Repo/releases/download/$Tag/okepy-$Version-py3-none-any.whl"
