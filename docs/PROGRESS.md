@@ -191,3 +191,20 @@
 - `scripts/install.sh` — `latest_version()` now passes the JSON body to `python3 -c` as an argument (no pipe+heredoc collision), adds a `User-Agent` header (GitHub API requires it), and falls back to the PyPI JSON API when the GitHub API is unreachable. Verified resolving `0.2.0` end-to-end against the live API.
 - `scripts/install.ps1` — mirrors the fallback: tries GitHub, then PyPI JSON API; only fails if both are unreachable (previously crashed on any GitHub error).
 - `.github/workflows/install.yml` — added a `bash-resolve` job that sources the script and asserts `latest_version` returns a semver string, so this regression is caught in CI.
+
+---
+
+## Bugfix (2026-07-19) — release pipeline + asset URL
+
+### Problems found
+1. **Cross-workflow tag chaining failed.** `autorelease.yml` pushed `v0.2.1`/`v0.2.2` tags with the default `GITHUB_TOKEN`, but GitHub does not trigger `on: push: tags:` workflows from tags pushed by another workflow using the default token. So `release.yml` never ran — no PyPI publish, no GitHub Release was created for those versions. PyPI stayed on `0.2.0`.
+2. **`externally-managed-environment` (PEP 668).** The script ran bare `pip install`, which fails on modern Debian/Ubuntu/macOS.
+3. **Forced `v` prefix on asset URL.** `TAG="v${VERSION}"` produced `.../v0.2.0/...` but the real `0.2.0` release tag is `0.2.0` (no prefix) → 404 on the GitHub asset (then PyPI fallback).
+
+### Fixed
+- **Consolidated into a single `release.yml`** triggered on `push: branches: [main]` (guarded by `github.actor != github-actions[bot]`). One job: bumps patch version → commits+tags `vX.Y.Z` → builds → publishes to PyPI → creates the GitHub release with the wheel. Removed `autorelease.yml` (cross-workflow chaining was the root cause).
+- **Install scripts prefer `pipx`** (PEP 668-safe; isolates the CLI), falling back to `pip` only if pipx is absent. `OKEPY_BIN` still overrides.
+- **Asset URL uses the raw release tag** (kept verbatim, e.g. `0.2.0` or `v0.2.1`) rather than a forced `v` prefix, so it matches the actual release regardless of tag convention.
+- Attached `okepy-0.2.0-py3-none-any.whl` to the existing `0.2.0` release so the GitHub-asset path works now.
+- Deleted orphan remote tags `v0.2.1`/`v0.2.2` (created by the broken autorelease, never released).
+
