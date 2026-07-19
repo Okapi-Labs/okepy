@@ -40,15 +40,22 @@ $Version = $Tag -replace '^v', ''
 Write-Host "okepy: latest release is $Tag"
 
 $AssetUrl = "https://github.com/$Repo/releases/download/$Tag/okepy-$Version-py3-none-any.whl"
+$PypiUrl = "https://files.pythonhosted.org/packages/py3/o/okepy/okepy-$Version-py3-none-any.whl"
 
 $tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "okepy-install")
 $whell = Join-Path $tmp.FullName "okepy-$Version-py3-none-any.whl"
 
-Write-Host "okepy: downloading $AssetUrl"
+Write-Host "okepy: downloading release wheel"
 try {
     Invoke-WebRequest -Uri $AssetUrl -OutFile $wheel -UseBasicParsing
+    Write-Host "okepy: using GitHub release asset"
 } catch {
-    Fail "failed to download wheel; the release may not publish a wheel asset"
+    Write-Host "okepy: no release asset; downloading from PyPI"
+    try {
+        Invoke-WebRequest -Uri $PypiUrl -OutFile $wheel -UseBasicParsing
+    } catch {
+        Fail "failed to download okepy $Version wheel from GitHub or PyPI"
+    }
 }
 
 Write-Host "okepy: installing with $InstallBin"

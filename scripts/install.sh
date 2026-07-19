@@ -45,16 +45,24 @@ VERSION="${TAG#v}"
 
 echo "okepy: latest release is ${TAG}"
 
-# Locate the pure-python wheel asset for this release.
-ASSET_URL="https://github.com/${REPO}/releases/download/${TAG}/okepy-${VERSION}-py3-none-any.whl"
-
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
 wheel="${tmp}/okepy-${VERSION}-py3-none-any.whl"
-echo "okepy: downloading ${ASSET_URL}"
-curl -fsSL "$ASSET_URL" -o "$wheel" \
-  || err "failed to download wheel; the release may not publish a wheel asset"
+
+# Prefer the GitHub release wheel; fall back to the PyPI wheel so the
+# installer works even when a release has no attached assets.
+ASSET_URL="https://github.com/${REPO}/releases/download/${TAG}/okepy-${VERSION}-py3-none-any.whl"
+PYPI_URL="https://files.pythonhosted.org/packages/py3/o/okepy/okepy-${VERSION}-py3-none-any.whl"
+
+echo "okepy: downloading release wheel"
+if curl -fsSL "$ASSET_URL" -o "$wheel"; then
+  echo "okepy: using GitHub release asset"
+else
+  echo "okepy: no release asset; downloading from PyPI"
+  curl -fsSL "$PYPI_URL" -o "$wheel" \
+    || err "failed to download okepy ${VERSION} wheel from GitHub or PyPI"
+fi
 
 echo "okepy: installing with ${INSTALL_BIN}"
 "${INSTALL_BIN}" install "$wheel" \
