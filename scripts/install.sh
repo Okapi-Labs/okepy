@@ -13,7 +13,6 @@
 set -euo pipefail
 
 REPO="${OKEPY_REPO:-Okapi-Labs/okepy}"
-INSTALL_BIN="${OKEPY_BIN:-pip}"
 
 err() { echo "okepy: error: $*" >&2; exit 1; }
 
@@ -23,6 +22,17 @@ need() {
 
 need curl
 need python3
+
+# Pick an install backend. pipx is preferred (it isolates the CLI in its own
+# venv and works on externally-managed Python installs, e.g. PEP 668). Override
+# with OKEPY_BIN="pip" or "uv pip" if you know what you are doing.
+if [ -n "${OKEPY_BIN:-}" ]; then
+  INSTALL_BIN="$OKEPY_BIN"
+elif command -v pipx >/dev/null 2>&1; then
+  INSTALL_BIN="pipx"
+else
+  INSTALL_BIN="pip"
+fi
 
 # Resolve the latest released version. Prefer the GitHub releases API; fall
 # back to the PyPI JSON API so an API hiccup (rate limit, empty body) never
@@ -71,14 +81,19 @@ PYPI_URL="https://files.pythonhosted.org/packages/py3/o/okepy/okepy-${VERSION}-p
 echo "okepy: downloading release wheel"
 if curl -fsSL "${API_HDR[@]}" "$ASSET_URL" -o "$wheel"; then
   echo "okepy: using GitHub release asset"
+elif curl -fsSL "${API_HDR[@]}" "$PYPI_URL" -o "$wheel"; then
+  echo "okepy: using PyPI wheel"
 else
-  echo "okepy: no release asset; downloading from PyPI"
-  curl -fsSL "${API_HDR[@]}" "$PYPI_URL" -o "$wheel" \
-    || err "failed to download okepy ${VERSION} wheel from GitHub or PyPI"
+  err "failed to download okepy ${VERSION} wheel from GitHub or PyPI"
 fi
 
 echo "okepy: installing with ${INSTALL_BIN}"
-"${INSTALL_BIN}" install "$wheel" \
-  || err "installation failed; check your Python/pip environment"
+if [ "$INSTALL_BIN" = "pipx" ]; then
+  pipx install "$wheel" \
+    || err "pipx install failed; try 'OKEPY_BIN=pip pip install --user $wheel' or use a virtual environment"
+else
+  "${INSTALL_BIN}" install "$wheel" \
+    || err "installation failed (externally-managed environment? use pipx, or OKEPY_BIN='pip install --break-system-packages')"
+fi
 
 echo "okepy: installed! Run it with: okepy create"
