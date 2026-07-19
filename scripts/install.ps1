@@ -24,35 +24,40 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
     Fail "python is required but not found on PATH"
 }
 
-# Resolve the latest release tag via the GitHub API.
+# Resolve the latest released version. Prefer the GitHub releases API; fall
+# back to the PyPI JSON API so an API hiccup never blocks installation.
+$Version = $null
 try {
-    $release = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -UseBasicParsing
+    $release = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -Headers @{"User-Agent"="okepy-installer"} -UseBasicParsing
+    if ($release.tag_name) { $Version = $release.tag_name -replace '^v', '' }
 } catch {
-    Fail "could not reach GitHub API: $_"
+    Write-Host "okepy: GitHub API unavailable, querying PyPI" -ForegroundColor Yellow
 }
-
-if (-not $release.tag_name) {
-    Fail "no published release found for $Repo"
+if (-not $Version) {
+    try {
+        $pypi = Invoke-RestMethod -Uri "https://pypi.org/pypi/okepy/json" -Headers @{"User-Agent"="okepy-installer"} -UseBasicParsing
+        $Version = $pypi.info.version
+    } catch {
+        Fail "could not resolve the latest okepy version (GitHub and PyPI both unreachable)"
+    }
 }
-
-$Tag = $release.tag_name
-$Version = $Tag -replace '^v', ''
-Write-Host "okepy: latest release is $Tag"
+$Tag = "v$Version"
+Write-Host "okepy: latest version is $Tag"
 
 $AssetUrl = "https://github.com/$Repo/releases/download/$Tag/okepy-$Version-py3-none-any.whl"
 $PypiUrl = "https://files.pythonhosted.org/packages/py3/o/okepy/okepy-$Version-py3-none-any.whl"
 
 $tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "okepy-install")
-$whell = Join-Path $tmp.FullName "okepy-$Version-py3-none-any.whl"
+$wheel = Join-Path $tmp.FullName "okepy-$Version-py3-none-any.whl"
 
 Write-Host "okepy: downloading release wheel"
 try {
-    Invoke-WebRequest -Uri $AssetUrl -OutFile $wheel -UseBasicParsing
+    Invoke-WebRequest -Uri $AssetUrl -OutFile $wheel -Headers @{"User-Agent"="okepy-installer"} -UseBasicParsing
     Write-Host "okepy: using GitHub release asset"
 } catch {
     Write-Host "okepy: no release asset; downloading from PyPI"
     try {
-        Invoke-WebRequest -Uri $PypiUrl -OutFile $wheel -UseBasicParsing
+        Invoke-WebRequest -Uri $PypiUrl -OutFile $wheel -Headers @{"User-Agent"="okepy-installer"} -UseBasicParsing
     } catch {
         Fail "failed to download okepy $Version wheel from GitHub or PyPI"
     }
