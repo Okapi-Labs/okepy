@@ -1,6 +1,10 @@
 # okepy — Progress Tracker
 
-> Updated: Session 7 — Renamed project from okapy to okepy (name collision on PyPI)
+> Updated: Session 8 — Added cross-platform one-line GitHub install scripts
+
+## Current Phase
+
+**Phase 5 — Social Authentication** (Completed)
 
 ## Current Phase
 
@@ -96,7 +100,9 @@
 - [ ] Plugin authoring docs, example plugin, version checks
 
 ### Phase 8 — Polish & Release
-- [ ] Progress spinners, better errors, PyPI publish
+- [x] One-line cross-platform install scripts (`scripts/install.sh`, `scripts/install.ps1`) — fetch latest GitHub release wheel, fall back to PyPI
+- [x] Release workflow uploads wheel asset; install scripts testable via `.github/workflows/install.yml`
+- [ ] Progress spinners, better errors
 
 ---
 
@@ -155,5 +161,7 @@
   - `lint` job matrixed over Python 3.10 / 3.11 / 3.12: runs `ruff check`, `ruff format --check`, `pytest -m "not slow"`
   - `integration-slow` job (Python 3.12 only): runs `pytest -m slow` (real-venv Django integration tests)
 - Existing `workflow.yml` (PyPI publish on release) left untouched.
-- Branch protection docs in CONTRIBUTING.md listing the four required status checks.
-- Fixed pre-existing ruff violations (unused imports, unused variables, import sorting, formatting) so CI would pass from day one.
+- Added `scripts/install.sh` (macOS/Linux) and `scripts/install.ps1` (Windows) — one-line GitHub installers that resolve the latest release via the GitHub API, download the wheel, and `pip install` it. Fall back to the PyPI wheel when a release has no attached asset (verified against live `0.2.0`: PyPI wheel downloads and validates as a valid 64KB wheel).
+- `.github/workflows/install.yml` — CI lints/parses both install scripts on every push/PR.
+- `.github/workflows/workflow.yml` — release workflow now uploads the wheel to the GitHub release.
+- README documents `curl ... | bash` and `irm ... | iex` one-line install commands plus `OKEPY_BIN` override.
