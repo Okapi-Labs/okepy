@@ -38,7 +38,7 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/Okapi-Labs/okepy/main/scripts/install.ps1 | iex
 ```
 
-These scripts download the latest GitHub release wheel and install it with `pip`. They are thin wrappers around `pip install`; use `pip install okepy` or `uvx okepy` when you can reach PyPI directly. Override the install command with `OKEPY_BIN=uv pip` if desired.
+These scripts download the latest GitHub release wheel and install it with `pip`. If the release has no attached asset, they fall back to the PyPI wheel, so the command works regardless. They are thin wrappers around `pip install`; use `pip install okepy` or `uvx okepy` when you can reach PyPI directly. Override the install command with `OKEPY_BIN=uv pip` if desired.
 
 ## 2. Create a project
 
