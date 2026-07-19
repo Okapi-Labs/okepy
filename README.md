@@ -38,7 +38,7 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/Okapi-Labs/okepy/main/scripts/install.ps1 | iex
 ```
 
-These scripts download the latest GitHub release wheel and install it with `pip`. If the release has no attached asset, they fall back to the PyPI wheel, so the command works regardless. They are thin wrappers around `pip install`; use `pip install okepy` or `uvx okepy` when you can reach PyPI directly. Override the install command with `OKEPY_BIN=uv pip` if desired.
+These scripts download the latest wheel and install it. By default they use **`pipx`** (which isolates the CLI in its own virtual environment and works on externally-managed Python installs — the `externally-managed-environment` / PEP 668 error). If `pipx` is unavailable they fall back to `pip`. They also fall back to the PyPI wheel when a GitHub release has no attached asset, so the command works regardless. Override the install backend with `OKEPY_BIN="pip"` or `OKEPY_BIN="uv pip"`.
 
 ### Automated releases
 
