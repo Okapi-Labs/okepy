@@ -175,10 +175,11 @@
 - `.github/workflows/release.yml` — on `v*` tag push: builds the wheel, publishes to PyPI (`PYPI_API_TOKEN` secret), and creates a GitHub release with the wheel attached. Replaces the old manual `workflow.yml` (removed).
 
 ### Flow
-`git push` to `main` → autorelease bumps patch + tags `vX.Y.Z` → release workflow builds, publishes to PyPI, and creates the GitHub release → install scripts (`curl … | bash` / `irm … | iex`) pick up the new version automatically. Minor/major releases are done by running `bump_version.py minor|major` before pushing.
+`git push` to `main` → `release.yml` bumps patch + tags `vX.Y.Z` → builds, publishes to PyPI, and creates the GitHub release → install scripts (`curl … | bash` / `irm … | iex`) pick up the new version automatically. Minor/major releases are done by running `bump_version.py minor|major` before pushing.
 
 ### Removed
-- `.github/workflows/workflow.yml` — superseded by `release.yml` (tag-triggered) + `autorelease.yml`.
+- `.github/workflows/workflow.yml` — superseded by the consolidated `release.yml`.
+- `.github/workflows/autorelease.yml` — merged into `release.yml` (single push-triggered job) to avoid cross-workflow tag-chaining.
 
 ---
 
